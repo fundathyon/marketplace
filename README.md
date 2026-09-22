@@ -114,10 +114,10 @@ plugins/
     plugin.json                       manifiesto Agent Plugins 1.0
     .claude-plugin/plugin.json        el mismo manifiesto, donde lo lee Claude Code
     skills/
-      accounts-integration/           un skill = una carpeta con SKILL.md
+      accounts-integration/           una skill = una carpeta con SKILL.md
         SKILL.md                      índice y reglas; lo que el agente lee primero
-        quickstart.md                 …y el resto de la documentación del flujo
-        openapi.json
+        references/                   la documentación por flujo, un archivo por tema
+        assets/openapi.json           el contrato HTTP, machine-readable
 ```
 
 Tres niveles, y conviene no confundirlos:
@@ -127,7 +127,9 @@ Tres niveles, y conviene no confundirlos:
 - **El plugin** es la unidad que instala un agente. Uno por servicio. Puede
   llevar skills, comandos, hooks y servidores MCP.
 - **La skill** es lo que el agente lee. Una carpeta con `SKILL.md` en la raíz,
-  según el [estándar Agent Skills](https://agentskills.io/specification).
+  el detalle en `references/` y los contratos en `assets/`, según el
+  [estándar Agent Skills](https://agentskills.io/specification). El agente carga
+  `SKILL.md` al activarla y las referencias solo cuando el flujo las pide.
 
 Los dos `plugin.json` llevan el mismo `name`, `version` y `description`, y la
 entrada del `marketplace.json` repite la `version`. Si no concuerdan, la
@@ -145,6 +147,8 @@ carpeta — lo exige el estándar.
 plugins/payments/plugin.json
 plugins/payments/.claude-plugin/plugin.json
 plugins/payments/skills/payments-integration/SKILL.md
+plugins/payments/skills/payments-integration/references/   documentación por flujo
+plugins/payments/skills/payments-integration/assets/       openapi.json y otros contratos
 ```
 
 **2. Escribir el frontmatter.** Solo campos del estándar, para que lo lean todos
@@ -180,10 +184,12 @@ relativo en string, `category` y `version`:
 
 Codex ignora cualquier otro tipo de `source`, así que siempre relativo.
 
-**4. Validar y documentar.** Añade la fila a la tabla de arriba.
+**4. Validar y documentar.** Añade la fila a la tabla de arriba. CI corre lo
+mismo en cada pull request; el detalle está en [AGENTS.md](AGENTS.md).
 
 ```sh
-claude plugin validate . --strict
+python3 scripts/validate.py          # catálogo, manifiestos y skills
+claude plugin validate . --strict    # como lo lee Claude Code
 ```
 
 ## Cuando un servicio tenga MCP
@@ -208,13 +214,14 @@ instalada. Renombrarla es publicar una nueva y retirar la vieja.
 ## Reglas para skills que funcionan en todos los agentes
 
 - `SKILL.md` por debajo de 500 líneas: los pasos y las reglas. El detalle va en
-  archivos aparte, enlazados con ruta relativa desde `SKILL.md`.
+  `references/`, enlazado con ruta relativa; los contratos y datos, en `assets/`.
 - Nombra los archivos del bundle relativos a la carpeta de la skill: cada agente
   la instala en un sitio distinto.
 - Nada de frontmatter específico de un agente (`allowed-tools`, `model`…) salvo
   que la skill lo necesite de verdad: los demás lo ignoran o lo leen distinto.
-- **Sin secretos, URLs internas ni datos personales.** Este repositorio es
-  público y la skill se copia en muchas máquinas.
+- **Sin secretos, URLs internas, marcas viejas ni datos personales.** Este
+  repositorio es público y la skill se copia en muchas máquinas. El validador
+  detiene credenciales con forma real; los dominios de ejemplo son `example.com`.
 
 ## De dónde vienen las skills
 

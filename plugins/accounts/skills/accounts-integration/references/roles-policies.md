@@ -85,4 +85,4 @@ curl "{BASE_URL}/api/v1/role-policies/{role_id}" \
 3. Tu app evalúa permisos según el rol del JWT/usuario
 4. Accounts gestiona roles; **tu app** implementa enforcement de policies o usa el rol como claim
 
-Ver JWT claims en [tokens.md](./tokens.md) y [openapi.json](./openapi.json).
+Ver JWT claims en [tokens.md](tokens.md) y [openapi.json](../assets/openapi.json).

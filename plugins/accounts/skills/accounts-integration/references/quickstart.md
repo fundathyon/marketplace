@@ -1,4 +1,4 @@
-# Quickstart — Foundathon Accounts
+# Quickstart — Foundathyon Accounts
 
 Flujo mínimo para autenticar un usuario en **5 minutos**.
 
@@ -107,7 +107,7 @@ curl -X GET "{BASE_URL}/api/v1/refresh-jwt" \
 
 ## Siguientes pasos
 
-- Verificación email ON → [email-auth.md](./email-auth.md) + [behaviors.md](./behaviors.md)
-- OAuth → [oauth.md](./oauth.md)
-- Magic link → [magic-link.md](./magic-link.md)
-- Errores → [error-scopes.md](./error-scopes.md)
+- Verificación email ON → [email-auth.md](email-auth.md) + [behaviors.md](behaviors.md)
+- OAuth → [oauth.md](oauth.md)
+- Magic link → [magic-link.md](magic-link.md)
+- Errores → [error-scopes.md](error-scopes.md)

@@ -161,4 +161,4 @@ signup → email con código → activate → signin → tokens
 signup → signin → tokens
 ```
 
-Ver [behaviors.md](./behaviors.md) y [auth-flows.md](./auth-flows.md).
+Ver [behaviors.md](behaviors.md) y [auth-flows.md](auth-flows.md).

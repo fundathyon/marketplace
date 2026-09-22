@@ -2,7 +2,7 @@
 
 Implementar manejo por **`error.scope`**, no solo HTTP status.
 
-Formato: ver [response-format.md](./response-format.md)
+Formato: ver [response-format.md](response-format.md)
 
 ---
 

@@ -109,4 +109,4 @@ curl -X POST "{BASE_URL}/api/v1/users/change-email/confirm" \
 curl "{BASE_URL}/api/v1/users?page=0&size=20"
 ```
 
-Consultar auth requerida en [openapi.json](./openapi.json).
+Consultar auth requerida en [openapi.json](../assets/openapi.json).

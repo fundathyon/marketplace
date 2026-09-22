@@ -80,4 +80,4 @@ Los webhooks **no reemplazan** el manejo de tokens en el cliente.
 | `GET /webhooks/events` | Ninguna |
 | `GET/POST/PATCH/DELETE /webhooks` | Secret key |
 
-Ver bodies exactos en [openapi.json](./openapi.json).
+Ver bodies exactos en [openapi.json](../assets/openapi.json).

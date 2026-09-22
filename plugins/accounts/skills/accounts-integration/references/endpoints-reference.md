@@ -1,8 +1,8 @@
 # Referencia completa de endpoints
 
-`{BASE_URL}` = host + ROOT_PATH. Auth: ver [api-keys-and-auth.md](./api-keys-and-auth.md).
+`{BASE_URL}` = host + ROOT_PATH. Auth: ver [api-keys-and-auth.md](api-keys-and-auth.md).
 
-Contrato detallado (schemas, params): [openapi.json](./openapi.json)
+Contrato detallado (schemas, params): [openapi.json](../assets/openapi.json)
 
 ---
 

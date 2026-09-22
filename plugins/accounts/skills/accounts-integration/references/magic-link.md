@@ -99,4 +99,4 @@ router.push("/dashboard");
 | 400/401 | Token inválido, expirado o ya usado |
 | 404 | Email no encontrado (según config) |
 
-Ver [behaviors.md](./behaviors.md).
+Ver [behaviors.md](behaviors.md).

@@ -53,7 +53,7 @@ Campos de token equivalentes:
 ## Reglas para integradores
 
 1. Comprobar `success` además del HTTP status
-2. Usar `error.scope` para lógica de UI (ver [error-scopes.md](./error-scopes.md))
+2. Usar `error.scope` para lógica de UI (ver [error-scopes.md](error-scopes.md))
 3. Loguear `trace_id` en soporte/debug
 4. No parsear `message` para lógica — puede cambiar; `scope` es estable
 
@@ -79,4 +79,4 @@ Algunos endpoints admin devuelven listas paginadas con query params:
 ?page=0&size=10&offset=0
 ```
 
-Consultar [openapi.json](./openapi.json) por endpoint.
+Consultar [openapi.json](../assets/openapi.json) por endpoint.

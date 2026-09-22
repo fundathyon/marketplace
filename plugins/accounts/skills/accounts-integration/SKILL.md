@@ -1,38 +1,40 @@
 ---
 name: accounts-integration
 description: >-
-  Documentación completa y autocontenida de Foundathon Accounts API. Usar para
+  Documentación completa y autocontenida de Foundathyon Accounts API. Usar para
   integrar signup, signin, refresh token, OAuth, magic link, webhooks, roles
   y behaviors. Skill portable — no requiere el repo de accounts.
+metadata:
+  version: "0.1.0"
 ---
 
-# Foundathon Accounts API — skill completo de integración
+# Foundathyon Accounts API — skill completo de integración
 
-**Skill autocontenido y portable.** Copia la carpeta entera a otros proyectos (Cursor o Claude Code). Toda la documentación está en **este mismo directorio** — no depende del repo de accounts.
+**Skill autocontenido y portable.** Copia la carpeta entera a otros proyectos (Cursor o Claude Code). Toda la documentación está en **`references/`** y el contrato en `assets/` — no depende del repo de accounts.
 
 ## Cómo usar este skill (agentes)
 
-Antes de generar código de integración, **lee los archivos de este folder según el flujo**. No inventes rutas ni headers: usa solo lo documentado aquí.
+Antes de generar código de integración, **lee los archivos de `references/` según el flujo**. No inventes rutas ni headers: usa solo lo documentado aquí.
 
 | Archivo | Cuándo leerlo |
 |---------|---------------|
-| [quickstart.md](./quickstart.md) | Primer contacto, flujo mínimo app → signup → signin |
-| [setup.md](./setup.md) | Docker, variables de entorno, `{BASE_URL}` |
-| [api-keys-and-auth.md](./api-keys-and-auth.md) | Tipos de auth, matriz por endpoint |
-| [response-format.md](./response-format.md) | Formato JSON success/error |
-| [auth-flows.md](./auth-flows.md) | Árbol de decisión de flujos |
-| [email-auth.md](./email-auth.md) | Signup, signin, activate, reset, login unificado |
-| [tokens.md](./tokens.md) | Refresh, validate, revoke, jwt/info |
-| [oauth.md](./oauth.md) | OAuth web redirect y native SDK |
-| [magic-link.md](./magic-link.md) | Autenticación passwordless |
-| [behaviors.md](./behaviors.md) | Config por app que cambia los flujos |
-| [users.md](./users.md) | CRUD usuario, metadata, change-email |
-| [roles-policies.md](./roles-policies.md) | RBAC admin |
-| [webhooks.md](./webhooks.md) | Eventos HTTP hacia tu backend |
-| [endpoints-reference.md](./endpoints-reference.md) | Tabla completa de endpoints |
-| [error-scopes.md](./error-scopes.md) | Errores por `scope` |
-| [sdk-patterns.md](./sdk-patterns.md) | Patrones frontend/backend |
-| [openapi.json](./openapi.json) | Contrato HTTP machine-readable (Swagger 2.0) |
+| [quickstart.md](references/quickstart.md) | Primer contacto, flujo mínimo app → signup → signin |
+| [setup.md](references/setup.md) | Docker, variables de entorno, `{BASE_URL}` |
+| [api-keys-and-auth.md](references/api-keys-and-auth.md) | Tipos de auth, matriz por endpoint |
+| [response-format.md](references/response-format.md) | Formato JSON success/error |
+| [auth-flows.md](references/auth-flows.md) | Árbol de decisión de flujos |
+| [email-auth.md](references/email-auth.md) | Signup, signin, activate, reset, login unificado |
+| [tokens.md](references/tokens.md) | Refresh, validate, revoke, jwt/info |
+| [oauth.md](references/oauth.md) | OAuth web redirect y native SDK |
+| [magic-link.md](references/magic-link.md) | Autenticación passwordless |
+| [behaviors.md](references/behaviors.md) | Config por app que cambia los flujos |
+| [users.md](references/users.md) | CRUD usuario, metadata, change-email |
+| [roles-policies.md](references/roles-policies.md) | RBAC admin |
+| [webhooks.md](references/webhooks.md) | Eventos HTTP hacia tu backend |
+| [endpoints-reference.md](references/endpoints-reference.md) | Tabla completa de endpoints |
+| [error-scopes.md](references/error-scopes.md) | Errores por `scope` |
+| [sdk-patterns.md](references/sdk-patterns.md) | Patrones frontend/backend |
+| [openapi.json](assets/openapi.json) | Contrato HTTP machine-readable (Swagger 2.0) |
 
 ---
 
@@ -61,7 +63,7 @@ API REST **self-hosted** de autenticación multi-tenant:
 | Refresh | `GET /api/v1/refresh-jwt` + Bearer refresh + public key |
 | Respuesta | `{ success, status_code, data?, error?: { message, scope }, trace_id? }` |
 | Token fields | `access_token`, `jwt` → equivalentes; siempre guardar `refresh_token` |
-| Behaviors | Signup/signin cambian si `verification.enabled` — ver [behaviors.md](./behaviors.md) |
+| Behaviors | Signup/signin cambian si `verification.enabled` — ver [behaviors.md](references/behaviors.md) |
 
 ---
 
@@ -111,10 +113,12 @@ Copia **toda la carpeta** del skill a:
 
 ```text
 # Global (todos tus proyectos)
+~/.agents/skills/accounts-integration/   # Cursor, Codex y Copilot
 ~/.cursor/skills/accounts-integration/
 ~/.claude/skills/accounts-integration/
 
 # Por proyecto
+tu-proyecto/.agents/skills/accounts-integration/
 tu-proyecto/.cursor/skills/accounts-integration/
 tu-proyecto/.claude/skills/accounts-integration/
 ```

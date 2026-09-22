@@ -132,4 +132,4 @@ Tu app → GET /oauths/link → redirect proveedor
        → tokens → tu app autenticada
 ```
 
-Ver también [auth-flows.md](./auth-flows.md).
+Ver también [auth-flows.md](auth-flows.md).

@@ -1,13 +1,11 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "API de autenticación y gestión de cuentas de usuario para Authify.\nProporciona endpoints para registro, login, gestión de usuarios, OAuth, roles, políticas y webhooks.",
-        "title": "Authify Accounts API",
-        "termsOfService": "http://swagger.io/terms/",
+        "description": "API de autenticación y gestión de cuentas de usuario para Foundathyon.\nProporciona endpoints para registro, login, gestión de usuarios, OAuth, roles, políticas y webhooks.",
+        "title": "Foundathyon Accounts API",
         "contact": {
-            "name": "Authify API Support",
-            "url": "http://www.authify.io/support",
-            "email": "support@authify.io"
+            "name": "Foundathyon",
+            "url": "https://docs.foundathyon.com"
         },
         "license": {
             "name": "Apache 2.0",
@@ -6006,7 +6004,7 @@
                 },
                 "redirect_base_url": {
                     "type": "string",
-                    "example": "https://lyron.lat"
+                    "example": "https://app.example.com"
                 },
                 "single_use": {
                     "type": "boolean",
@@ -6509,7 +6507,7 @@
                 },
                 "logo_url": {
                     "type": "string",
-                    "example": "https://lyron.lat/logo.png"
+                    "example": "https://app.example.com/logo.png"
                 },
                 "subject": {
                     "type": "string",

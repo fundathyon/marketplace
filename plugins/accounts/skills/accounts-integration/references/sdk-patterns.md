@@ -103,7 +103,7 @@ class AccountsError extends Error {
 }
 ```
 
-Ver [error-scopes.md](./error-scopes.md).
+Ver [error-scopes.md](error-scopes.md).
 
 ---
 

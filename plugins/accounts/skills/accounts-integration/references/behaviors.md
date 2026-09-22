@@ -74,7 +74,7 @@ curl -X POST "{BASE_URL}/api/v1/app-behaviors/email/magic-link/activate" \
   -d '{ "enabled": true }'
 ```
 
-Ver [magic-link.md](./magic-link.md).
+Ver [magic-link.md](magic-link.md).
 
 ---
 
@@ -119,4 +119,4 @@ Si el usuario no especifica la config:
 2. O implementar ambos caminos (signup → check response → activate si aplica)
 3. Documentar qué behavior asumiste
 
-Ver [auth-flows.md](./auth-flows.md).
+Ver [auth-flows.md](auth-flows.md).

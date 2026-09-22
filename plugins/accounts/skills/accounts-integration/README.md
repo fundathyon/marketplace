@@ -1,4 +1,4 @@
-# Foundathon Accounts — skill portable
+# Foundathyon Accounts — skill portable
 
 **Documentación completa autocontenida** para integrar Accounts desde cualquier proyecto con Cursor o Claude Code.
 
@@ -84,7 +84,7 @@ Editar siempre en `.agents/accounts-integration/` en el repo accounts.
 
 ## Prompt de ejemplo
 
-> Integra login con email, signup y refresh token usando Foundathon Accounts.
+> Integra login con email, signup y refresh token usando Foundathyon Accounts.
 > BASE_URL=https://api.example.com/accounts, PK en env.
 > Usa el skill accounts-integration.
 

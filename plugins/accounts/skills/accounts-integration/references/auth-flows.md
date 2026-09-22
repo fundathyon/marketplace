@@ -52,7 +52,7 @@ POST /api/v1/emails/magic-link/request  → envía enlace/código
 POST /api/v1/emails/magic-link/claim    → intercambia token por sesión
 ```
 
-Guía completa: [magic-link.md](./magic-link.md)
+Guía completa: [magic-link.md](magic-link.md)
 
 ---
 
@@ -72,7 +72,7 @@ Guía completa: [magic-link.md](./magic-link.md)
 
 Config admin (secret key): `POST /api/v1/oauth-configs`
 
-Detalle: [oauth.md](./oauth.md)
+Detalle: [oauth.md](oauth.md)
 
 ---
 
@@ -87,7 +87,7 @@ Frontend obtiene id_token del SDK nativo
 
 Audiences nativas se configuran con secret key en `/api/v1/oauth-configs/{id}/audiences`.
 
-Detalle: [oauth.md](./oauth.md)
+Detalle: [oauth.md](oauth.md)
 
 ---
 
@@ -113,7 +113,7 @@ Logout en dispositivo (servidor):
   Authorization: Bearer {refresh_token}
 ```
 
-Detalle: [tokens.md](./tokens.md)
+Detalle: [tokens.md](tokens.md)
 
 ---
 
