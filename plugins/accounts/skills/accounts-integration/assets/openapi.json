@@ -6503,7 +6503,7 @@
                 },
                 "from_name": {
                     "type": "string",
-                    "example": "Lyron"
+                    "example": "Mi App"
                 },
                 "logo_url": {
                     "type": "string",
@@ -6511,7 +6511,7 @@
                 },
                 "subject": {
                     "type": "string",
-                    "example": "Tu acceso a Lyron"
+                    "example": "Tu acceso a Mi App"
                 }
             }
         },
