@@ -5,7 +5,7 @@
     "url": "https://github.com/fundathyon"
   },
   "metadata": {
-    "description": "Skills de integración de Foundathyon para agentes de código — instala la documentación real de la API de un servicio en Claude Code, Cursor, Codex o Copilot.",
+    "description": "Conjunto de skills y herramientas de AI de Foundathyon para integrar sus servicios desde Claude Code, Cursor, Codex o Copilot.",
     "version": "0.1.0"
   },
   "plugins": [
@@ -15,7 +15,14 @@
       "description": "Integra Foundathyon Accounts: signup, signin, refresh token, OAuth, magic link, webhooks, roles y behaviors — con las rutas, headers y formato de respuesta reales.",
       "version": "0.1.0",
       "category": "integration",
-      "keywords": ["accounts", "autenticacion", "oauth", "magic-link", "webhooks", "foundathyon"]
+      "keywords": [
+        "accounts",
+        "autenticacion",
+        "oauth",
+        "magic-link",
+        "webhooks",
+        "foundathyon"
+      ]
     }
   ]
 }

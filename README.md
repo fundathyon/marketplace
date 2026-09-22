@@ -1,15 +1,15 @@
 # Foundathyon marketplace
 
-Foundathyon ofrece los módulos que toda startup acaba construyendo igual:
-autenticación y cuentas de usuario, tareas programadas, y en camino pagos y
-APIs simuladas. Piezas robustas, listas, para que tu equipo funde la empresa en
-lugar de reconstruir lo de siempre.
+Foundathyon ofrece los módulos que toda startup acaba construyendo igual —
+robustos, listos, para que tu equipo funde la empresa en lugar de reconstruir lo
+de siempre. Hoy, **Accounts**: autenticación y cuentas de usuario. Los servicios
+que vengan entrarán aquí igual.
 
-Este marketplace publica, por cada servicio, una **skill para tu agente de
-código**: la instalas en **Claude Code**, **Cursor**, **Codex** o **GitHub
-Copilot**, y a partir de ahí el asistente integra ese servicio con sus rutas,
-headers y formato de respuesta **reales** — sin inventarlos y sin que tengas que
-pegarle la documentación en cada prompt.
+Este marketplace es el **conjunto de skills y herramientas de AI** de Foundathyon
+para tu agente de código. Instalas lo de un servicio en **Claude Code**,
+**Cursor**, **Codex** o **GitHub Copilot**, y a partir de ahí el asistente lo
+integra con sus rutas, headers y formato de respuesta **reales** — sin
+inventarlos y sin que tengas que pegarle la documentación en cada prompt.
 
 ## Qué hay hoy
 
@@ -227,8 +227,8 @@ antigua.
 
 ### Cuando Foundathyon publique un servicio nuevo
 
-Entra en este mismo marketplace como otro plugin. Imaginemos que sale la skill
-del servicio de tareas programadas, `crons`:
+Entra en este mismo marketplace como otro plugin. Imaginemos uno hipotético al
+que llamaremos `crons` — el nombre es inventado, solo para el ejemplo:
 
 **Claude Code** — refresca el catálogo e instálalo. El marketplace ya lo
 tienes añadido:
@@ -246,8 +246,8 @@ git -C marketplace pull
 cp -r marketplace/plugins/crons/skills/crons-integration ~/.agents/skills/
 ```
 
-Instalas solo los servicios que usas. Cada uno tiene su propia versión y su
-propia skill; el agente solo carga las que tienes instaladas.
+Instalas solo los servicios que usas. Cada uno tiene su propia versión y sus
+propias skills y herramientas; el agente solo carga las que tienes instaladas.
 
 ## Eliminar
 
@@ -292,14 +292,14 @@ Tres niveles:
 - **El plugin** es la unidad que instala un agente. Uno por servicio.
 - **La skill** es lo que el agente lee: `SKILL.md`, `references/`, `assets/`.
 
-Con un segundo servicio — el `crons` del ejemplo — la estructura crece hacia
-los lados, sin tocar lo que ya tienes:
+Con un segundo servicio — el `crons` inventado del ejemplo — la estructura
+crece hacia los lados, sin tocar lo que ya tienes:
 
 ```text
 plugins/
   accounts/
     skills/accounts-integration/…
-  crons/                              ← ejemplo, todavía no publicado
+  crons/                              ← nombre inventado, solo para el ejemplo
     plugin.json
     .claude-plugin/plugin.json
     skills/crons-integration/
