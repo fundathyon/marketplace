@@ -1,52 +1,24 @@
 # Foundathyon marketplace
 
-Skills de integración de Foundathyon para tu agente de código. Instalas la skill
-de un servicio en **Claude Code**, **Cursor**, **Codex** o **GitHub Copilot**, y
-a partir de ahí el asistente escribe la integración con las rutas, headers y
-formato de respuesta **reales** de ese servicio — sin inventarlos, sin que
-tengas que pegarle la documentación en cada prompt.
+Foundathyon ofrece los módulos que toda startup acaba construyendo igual:
+autenticación y cuentas de usuario, tareas programadas, y en camino pagos y
+APIs simuladas. Piezas robustas, listas, para que tu equipo funde la empresa en
+lugar de reconstruir lo de siempre.
 
-Hoy publica un servicio, **Accounts**. Cada servicio nuevo de Foundathyon
-entrará aquí como un plugin más, y se instalará igual.
+Este marketplace publica, por cada servicio, una **skill para tu agente de
+código**: la instalas en **Claude Code**, **Cursor**, **Codex** o **GitHub
+Copilot**, y a partir de ahí el asistente integra ese servicio con sus rutas,
+headers y formato de respuesta **reales** — sin inventarlos y sin que tengas que
+pegarle la documentación en cada prompt.
 
-## Cómo funciona
+## Qué hay hoy
 
-```mermaid
-flowchart LR
-    S["Repositorio del servicio<br/>(p. ej. Accounts)<br/>OpenAPI → skill"] -->|"se publica aquí"| M["fundathyon/marketplace<br/>este repositorio"]
-    M -->|"/plugin install"| CC["Claude Code"]
-    M -->|"copiar la carpeta"| OT["Cursor · Codex · Copilot"]
-    CC --> P["Tu proyecto:<br/>código de integración<br/>con rutas reales"]
-    OT --> P
-```
+| Servicio | Plugin | Skill | Qué te da | Versión |
+| --- | --- | --- | --- | --- |
+| **Accounts** — cuentas y login | `accounts` | [`accounts-integration`](plugins/accounts/skills/accounts-integration/SKILL.md) | Signup, signin, refresh token, OAuth, magic link, webhooks, roles y behaviors, integrados en tu código | 0.1.0 |
 
-Una **skill** es una carpeta con un `SKILL.md` en la raíz, según el estándar
-abierto [Agent Skills](https://agentskills.io), que leen todos esos agentes.
-Al arrancar, el agente solo carga el nombre y la descripción de cada skill que
-tiene instalada; cuando le pides algo que encaja, abre el `SKILL.md`, y de ahí
-solo la guía del flujo que necesita. Así puede tener muchas skills sin gastar
-contexto hasta que hacen falta.
-
-```mermaid
-sequenceDiagram
-    participant Dev as Tú
-    participant Agent as Agente (Claude Code, Cursor…)
-    participant Skill as accounts-integration
-    participant Code as Tu proyecto
-
-    Dev->>Agent: "Integra login con magic link usando Foundathyon Accounts"
-    Agent->>Skill: lee SKILL.md — reglas, happy path, índice de flujos
-    Agent->>Skill: abre references/magic-link.md
-    Agent->>Skill: consulta assets/openapi.json para los campos exactos
-    Agent->>Code: escribe la integración con rutas y headers reales
-    Agent-->>Dev: te dice qué variables de entorno faltan
-```
-
-## Qué tienes hoy: Accounts
-
-| Plugin | Skill | Qué es | Versión |
-| --- | --- | --- | --- |
-| `accounts` | [`accounts-integration`](plugins/accounts/skills/accounts-integration/SKILL.md) | Toda la integración de Foundathyon Accounts: signup, signin, refresh token, OAuth, magic link, webhooks, roles y behaviors | 0.1.0 |
+Cada servicio nuevo de Foundathyon entra aquí como un plugin más y se instala
+igual. [Cómo recibirlo cuando salga](#cuando-foundathyon-publique-un-servicio-nuevo).
 
 **Un plugin, una skill, dieciséis guías.** El plugin `accounts` es lo que
 instalas. Contiene una sola skill, `accounts-integration`, y no dieciséis, a
@@ -73,29 +45,54 @@ pides**. Cada guía es un archivo de `references/`:
 | `error-scopes` | Errores por `scope` |
 | `sdk-patterns` | Patrones frontend/backend |
 
-Y el contrato HTTP completo, machine-readable, en `assets/openapi.json`
-(Swagger 2.0), para que el agente consulte los campos exactos de cada body.
+Y el contrato HTTP completo, machine-readable, en `assets/openapi.json`, para
+que el agente consulte los campos exactos de cada body.
 
-## Instalar
+## Cómo funciona
 
 ```mermaid
-flowchart TD
-    Q{"¿Qué agente usas?"}
-    Q -->|"Claude Code"| A["/plugin install accounts --marketplace fundathyon/marketplace"]
-    Q -->|"Cursor · Codex · Copilot"| B["copia la skill a ~/.agents/skills/"]
-    Q -->|"otro que lea Agent Skills"| C["copia la skill a la carpeta de skills de tu agente"]
+flowchart LR
+    S["Servicio de Foundathyon<br/>(p. ej. Accounts)<br/>OpenAPI → skill"] -->|"se publica aquí"| M["fundathyon/marketplace"]
+    M -->|"/plugin install"| CC["Claude Code"]
+    M -->|"copiar la carpeta"| OT["Cursor · Codex · Copilot"]
+    CC --> P["Tu proyecto:<br/>integración con rutas reales"]
+    OT --> P
 ```
 
-### Claude Code — como plugin
+Una **skill** es una carpeta con un `SKILL.md`, según el estándar abierto
+[Agent Skills](https://agentskills.io), que leen todos esos agentes. Al
+arrancar, el agente solo carga el nombre y la descripción de cada skill
+instalada; cuando le pides algo que encaja, abre el `SKILL.md` y, de ahí, solo
+la guía del flujo que necesita.
 
-Un solo comando, escrito **dentro de Claude Code** (no en la terminal):
+```mermaid
+sequenceDiagram
+    participant Dev as Tú
+    participant Agent as Agente (Claude Code, Cursor…)
+    participant Skill as accounts-integration
+    participant Code as Tu proyecto
+
+    Dev->>Agent: "Integra login con magic link usando Foundathyon Accounts"
+    Agent->>Skill: lee SKILL.md — reglas, happy path, índice de flujos
+    Agent->>Skill: abre references/magic-link.md
+    Agent->>Skill: consulta assets/openapi.json para los campos exactos
+    Agent->>Code: escribe la integración con rutas y headers reales
+    Agent-->>Dev: te dice qué variables de entorno faltan
+```
+
+## Instalar por primera vez
+
+### Claude Code
+
+Un solo comando, escrito **dentro de Claude Code** (no en la terminal).
+Requiere Claude Code 2.1.275 o posterior:
 
 ```
 /plugin install accounts --marketplace fundathyon/marketplace
 ```
 
-Requiere Claude Code 2.1.275 o posterior. En versiones anteriores, en dos
-pasos — el marketplace se añade una sola vez y sirve para todos los servicios:
+En versiones anteriores, en dos pasos — el marketplace se añade una sola vez y
+sirve para todos los servicios de Foundathyon:
 
 ```
 /plugin marketplace add fundathyon/marketplace
@@ -110,9 +107,11 @@ Al instalar eliges el alcance:
 | **project** | todo el equipo del repositorio | `.claude/settings.json` del repo, commiteado |
 | **local** | solo tú, solo en este repositorio | `.claude/settings.local.json` |
 
+Comprueba que está: `/plugin list`.
+
 Para que un equipo lo tenga sin instalar nada a mano, declara el marketplace en
-el `.claude/settings.json` del repositorio; Claude Code lo añade al confiar en
-la carpeta y muestra el comando de instalación del plugin:
+el `.claude/settings.json` del repositorio. Claude Code lo añade cuando cada
+persona confía en la carpeta, y le muestra el comando para instalar el plugin:
 
 ```json
 {
@@ -125,36 +124,47 @@ la carpeta y muestra el comando de instalación del plugin:
 }
 ```
 
-### Cursor, Codex y Copilot — copiando la carpeta
+### Cursor
 
-Estos agentes no instalan plugins de Claude Code, pero leen el mismo formato
-Agent Skills. Los tres leen `~/.agents/skills/`, así que **una sola copia cubre
-los tres**:
-
-```sh
-git clone https://github.com/fundathyon/marketplace
-mkdir -p ~/.agents/skills
-cp -r marketplace/plugins/accounts/skills/accounts-integration ~/.agents/skills/
-```
-
-Sin clonar, desde la documentación de Accounts, que sirve el mismo bundle:
+Cursor no instala plugins de Claude Code, pero lee el mismo formato Agent
+Skills. Copia la skill a `~/.agents/skills/` — la misma carpeta que leen Codex y
+Copilot, así que una copia sirve para los tres:
 
 ```sh
 mkdir -p ~/.agents/skills && curl -fsSL https://docs.foundathyon.com/downloads/accounts-integration.tar.gz \
   | tar -xz -C ~/.agents/skills
 ```
 
-Rutas por agente, si prefieres ser explícito:
+Para un solo proyecto, usa `.agents/skills/` dentro del repositorio: la skill se
+commitea con el código y la tienen tus compañeros. Cursor también lee
+`.cursor/skills/` y, por compatibilidad, `.claude/skills/`.
 
-| Agente | En un repositorio | Para tu usuario |
-| --- | --- | --- |
-| Cursor, Codex, Copilot | `.agents/skills/<skill>` | `~/.agents/skills/<skill>` |
-| Cursor (ruta propia) | `.cursor/skills/<skill>` | `~/.cursor/skills/<skill>` |
-| Claude Code, sin plugin | `.claude/skills/<skill>` | `~/.claude/skills/<skill>` |
+Comprueba que está: `ls ~/.agents/skills/accounts-integration/SKILL.md`.
 
-Cursor además lee `.claude/skills/` y `.codex/skills/` por compatibilidad.
-Instalada **dentro de un repositorio**, la skill se commitea con el código: la
-tienen tus compañeros y también los agentes que corren en la nube.
+### Codex
+
+El mismo comando que Cursor. Codex busca skills en `.agents/skills` desde el
+directorio actual hasta la raíz del repositorio, y en `~/.agents/skills` para tu
+usuario:
+
+```sh
+mkdir -p ~/.agents/skills && curl -fsSL https://docs.foundathyon.com/downloads/accounts-integration.tar.gz \
+  | tar -xz -C ~/.agents/skills
+```
+
+### GitHub Copilot
+
+Copilot (CLI, VS Code y el agente de código) lee `.agents/skills/` en el
+repositorio y `~/.agents/skills/` para tu usuario. El mismo comando de arriba.
+
+### Sin `curl`: clonando el repositorio
+
+Si prefieres ver lo que instalas, clona y copia la carpeta de la skill:
+
+```sh
+git clone https://github.com/fundathyon/marketplace
+cp -r marketplace/plugins/accounts/skills/accounts-integration ~/.agents/skills/
+```
 
 ## Usar
 
@@ -191,37 +201,82 @@ ACCOUNTS_PUBLISHABLE_KEY=pk_live_...
 ACCOUNTS_SECRET_KEY=sk_live_...        # solo backend
 ```
 
-Lo que el agente hace con la skill instalada:
+Con la skill instalada, el agente lee `SKILL.md` al activarla y las guías según
+el flujo; no inventa rutas ni headers; distingue `/v1/apps` (sin `/api`) de las
+rutas de auth `/api/v1/...`; y mantiene la secret key fuera del frontend.
 
-- Lee `SKILL.md` al activarla y las guías **según el flujo** que le pidas.
-- No inventa rutas ni headers: respeta la matriz de autenticación y el formato
-  de respuesta.
-- Distingue `/v1/apps` (sin `/api`) de las rutas de auth `/api/v1/...`.
-- Mantiene la secret key fuera del frontend.
-
-## Mantenerlo al día
+## Actualizar
 
 La skill se genera desde el OpenAPI de Accounts. Una skill vieja genera código
 contra rutas que ya no existen, así que conviene no quedarse con una copia
-antigua:
+antigua.
 
-- **Claude Code:** `/plugin update accounts`.
-- **Cursor, Codex, Copilot:** vuelve a copiar la carpeta o relanza el `curl`;
-  sobrescribe la anterior.
+**Claude Code**
+
+```
+/plugin update accounts
+```
 
 > [!IMPORTANT]
 > Claude Code trae el auto-update **desactivado** por defecto en marketplaces
-> de terceros como este. Actívalo en `/plugin` → **Marketplaces** →
-> **Enable auto-update**, o actualiza a mano.
+> de terceros como este. Actívalo una vez en `/plugin` → **Marketplaces** →
+> **foundathyon** → **Enable auto-update**, y no tendrás que volver a pensarlo.
 
-## Estructura del repositorio
+**Cursor, Codex y Copilot** — relanza el mismo `curl` de la instalación (o
+`git pull` en el clon y vuelve a copiar la carpeta); sobrescribe la anterior.
+
+### Cuando Foundathyon publique un servicio nuevo
+
+Entra en este mismo marketplace como otro plugin. Imaginemos que sale la skill
+del servicio de tareas programadas, `crons`:
+
+**Claude Code** — refresca el catálogo e instálalo. El marketplace ya lo
+tienes añadido:
+
+```
+/plugin marketplace update foundathyon
+/plugin install crons@foundathyon
+```
+
+**Cursor, Codex y Copilot** — copia la skill nueva a la misma carpeta que la de
+Accounts, desde el clon o con el `curl` que publique su documentación:
+
+```sh
+git -C marketplace pull
+cp -r marketplace/plugins/crons/skills/crons-integration ~/.agents/skills/
+```
+
+Instalas solo los servicios que usas. Cada uno tiene su propia versión y su
+propia skill; el agente solo carga las que tienes instaladas.
+
+## Eliminar
+
+**Claude Code**
+
+```
+/plugin uninstall accounts@foundathyon     # quita el plugin
+/plugin disable accounts@foundathyon       # lo deja instalado, pero apagado
+/plugin marketplace remove foundathyon     # quita el marketplace y todos sus plugins
+```
+
+**Cursor, Codex y Copilot** — borra la carpeta, y la copia por proyecto si la
+hiciste:
+
+```sh
+rm -rf ~/.agents/skills/accounts-integration
+```
+
+En Codex también puedes apagarla sin borrarla, con una entrada
+`[[skills.config]]` en `~/.codex/config.toml`.
+
+## Estructura
 
 ```text
 .claude-plugin/
   marketplace.json                    el catálogo: qué plugins hay y dónde
 plugins/
   accounts/                           un plugin = un servicio de Foundathyon
-    plugin.json                       manifiesto Agent Plugins 1.0
+    plugin.json                       manifiesto del plugin
     .claude-plugin/plugin.json        el mismo manifiesto, donde lo lee Claude Code
     skills/
       accounts-integration/           una skill = una carpeta con SKILL.md
@@ -230,67 +285,51 @@ plugins/
         assets/openapi.json           el contrato HTTP, machine-readable
 ```
 
-Tres niveles, y conviene no confundirlos:
+Tres niveles:
 
 - **El marketplace** es el catálogo. Solo `marketplace.json`: no contiene código,
   apunta a los plugins.
-- **El plugin** es la unidad que instala un agente. Uno por servicio. Puede
-  llevar skills, comandos, hooks y servidores MCP.
+- **El plugin** es la unidad que instala un agente. Uno por servicio.
 - **La skill** es lo que el agente lee: `SKILL.md`, `references/`, `assets/`.
 
-### Cuando haya más servicios
-
-Imaginemos que Foundathyon publica, además de Accounts, un servicio hipotético
-de notificaciones. Entraría como **otro plugin**, con su propia skill, sin
-tocar el de Accounts:
+Con un segundo servicio — el `crons` del ejemplo — la estructura crece hacia
+los lados, sin tocar lo que ya tienes:
 
 ```text
 plugins/
   accounts/
     skills/accounts-integration/…
-  notifications/                      ← hipotético, solo para ilustrar
+  crons/                              ← ejemplo, todavía no publicado
     plugin.json
     .claude-plugin/plugin.json
-    skills/notifications-integration/
+    skills/crons-integration/
       SKILL.md
       references/
       assets/openapi.json
 ```
 
-Y se instalaría igual — el marketplace ya lo tienes añadido:
+## Preguntas frecuentes
 
-```
-/plugin install notifications@foundathyon
-```
+**¿La skill llama a la API del servicio?** No. Enseña al agente a integrarla;
+la llama el código que el agente escribe en tu proyecto. Cuando un servicio
+tenga servidor MCP, entrará en el mismo plugin y entonces el agente sí podrá
+llamarlo directamente.
 
-Cada servicio mantiene su propia versión. Instalas solo los que usas, y el
-agente carga solo las skills que tiene instaladas.
+**¿Necesito Claude Code?** No. Cualquier agente que lea Agent Skills — Cursor,
+Codex, Copilot, Gemini CLI, Kiro y muchos más — usa la misma carpeta. Claude
+Code es el único que la instala con un comando y la actualiza con otro.
 
-### Cuando un servicio tenga MCP
+**¿Uso varios agentes?** Instala el plugin en Claude Code y copia la skill a
+`~/.agents/skills/`; con eso quedan cubiertos todos.
 
-Un plugin no se limita a skills: puede declarar un servidor **MCP**. Así conectan
-su servicio los plugins de integración del marketplace oficial de Claude Code
-(GitHub, Stripe, Supabase, Sentry): sin que el usuario configure nada.
+**¿Es seguro instalarlo?** Una skill son documentos: Markdown y un OpenAPI. No
+ejecuta nada en tu máquina. Cada cambio pasa por CI: el validador del estándar,
+el de Claude Code y el de este repositorio.
 
-Cuando Accounts tenga servidor MCP, entrará en el **mismo** plugin `accounts`.
-La skill enseña al agente a integrar la API; el MCP le deja llamarla. Se
-complementan, y tú sigues instalando un solo plugin.
-
-## Contribuir
-
-Las reglas para añadir un servicio, cambiar una skill y validar están en
-[AGENTS.md](AGENTS.md). Lo esencial:
-
-- Cada skill se genera en el repositorio de su servicio y se copia aquí — el
-  servicio es la fuente de verdad. Para Accounts es `.agents/accounts-integration/`,
-  regenerada desde el contrato OpenAPI con `make sync-integration-docs`.
-- Antes de un pull request, los mismos validadores que corre CI:
-
-```sh
-python3 scripts/validate.py          # catálogo, manifiestos y skills
-python3 -m unittest discover tests   # el validador contra sí mismo
-claude plugin validate . --strict    # como lo lee Claude Code
-```
-
-La documentación para humanos del mismo contenido está en
+**¿Dónde está la documentación para humanos?** El mismo contenido, en
 [docs.foundathyon.com](https://docs.foundathyon.com/es/plataforma/ai-skills).
+
+---
+
+¿Mantienes este marketplace? Las reglas para añadir un servicio, versionar y
+validar están en [AGENTS.md](AGENTS.md).
