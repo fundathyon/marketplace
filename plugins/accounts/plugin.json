@@ -1,12 +1,12 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "accounts",
-  "version": "0.1.0",
-  "description": "Integra Foundathyon Accounts: signup, signin, refresh token, OAuth, magic link, webhooks, roles y behaviors — con las rutas, headers y formato de respuesta reales.",
+  "version": "0.2.0",
+  "description": "Integra Foundathyon Accounts: signup, signin, refresh token, OAuth, magic link, código de acceso por correo (email OTP), webhooks, roles y behaviors — con las rutas, headers y formato de respuesta reales.",
   "author": {
     "name": "Foundathyon",
     "url": "https://github.com/fundathyon"
   },
   "repository": "https://github.com/fundathyon/marketplace",
-  "keywords": ["accounts", "autenticacion", "oauth", "magic-link", "webhooks", "foundathyon"]
+  "keywords": ["accounts", "autenticacion", "oauth", "magic-link", "email-code", "passwordless", "webhooks", "foundathyon"]
 }

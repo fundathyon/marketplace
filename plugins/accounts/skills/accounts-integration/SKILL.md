@@ -2,10 +2,11 @@
 name: accounts-integration
 description: >-
   Documentación completa y autocontenida de Foundathyon Accounts API. Usar para
-  integrar signup, signin, refresh token, OAuth, magic link, webhooks, roles
-  y behaviors. Skill portable — no requiere el repo de accounts.
+  integrar signup, signin, refresh token, OAuth, magic link, código de acceso
+  por correo (email OTP), webhooks, roles y behaviors. Skill portable — no
+  requiere el repo de accounts.
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # Foundathyon Accounts API — skill completo de integración
@@ -26,7 +27,8 @@ Antes de generar código de integración, **lee los archivos de `references/` se
 | [email-auth.md](references/email-auth.md) | Signup, signin, activate, reset, login unificado |
 | [tokens.md](references/tokens.md) | Refresh, validate, revoke, jwt/info |
 | [oauth.md](references/oauth.md) | OAuth web redirect y native SDK |
-| [magic-link.md](references/magic-link.md) | Autenticación passwordless |
+| [magic-link.md](references/magic-link.md) | Autenticación passwordless por enlace |
+| [email-code.md](references/email-code.md) | Autenticación passwordless por código (email OTP): entrar y crear cuenta con un código |
 | [behaviors.md](references/behaviors.md) | Config por app que cambia los flujos |
 | [users.md](references/users.md) | CRUD usuario, metadata, change-email |
 | [roles-policies.md](references/roles-policies.md) | RBAC admin |
@@ -42,7 +44,7 @@ Antes de generar código de integración, **lee los archivos de `references/` se
 
 API REST **self-hosted** de autenticación multi-tenant:
 
-- Email/contraseña, magic link, OAuth (Google, Apple, Microsoft, GitHub)
+- Email/contraseña, magic link, código de acceso por correo, OAuth (Google, Apple, Microsoft, GitHub)
 - JWT (RSA) + refresh tokens
 - API keys por app (publishable + secret)
 - Roles, políticas RBAC, webhooks

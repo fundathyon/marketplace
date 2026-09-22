@@ -15,13 +15,13 @@ inventarlos y sin que tengas que pegarle la documentación en cada prompt.
 
 | Servicio | Plugin | Skill | Qué te da | Versión |
 | --- | --- | --- | --- | --- |
-| **Accounts** — cuentas y login | `accounts` | [`accounts-integration`](plugins/accounts/skills/accounts-integration/SKILL.md) | Signup, signin, refresh token, OAuth, magic link, webhooks, roles y behaviors, integrados en tu código | 0.1.0 |
+| **Accounts** — cuentas y login | `accounts` | [`accounts-integration`](plugins/accounts/skills/accounts-integration/SKILL.md) | Signup, signin, refresh token, OAuth, magic link, código de acceso por correo, webhooks, roles y behaviors, integrados en tu código | 0.2.0 |
 
 Cada servicio nuevo de Foundathyon entra aquí como un plugin más y se instala
 igual. [Cómo recibirlo cuando salga](#cuando-foundathyon-publique-un-servicio-nuevo).
 
-**Un plugin, una skill, dieciséis guías.** El plugin `accounts` es lo que
-instalas. Contiene una sola skill, `accounts-integration`, y no dieciséis, a
+**Un plugin, una skill, diecisiete guías.** El plugin `accounts` es lo que
+instalas. Contiene una sola skill, `accounts-integration`, y no diecisiete, a
 propósito: el agente carga un índice pequeño (`SKILL.md`, con las reglas que
 nunca debe violar y el happy path) y después **solo la guía del flujo que le
 pides**. Cada guía es un archivo de `references/`:
@@ -36,7 +36,8 @@ pides**. Cada guía es un archivo de `references/`:
 | `email-auth` | Signup, signin, activación, reset, login unificado |
 | `tokens` | Refresh, validación, revocación, `jwt/info` |
 | `oauth` | OAuth web redirect y SDK nativo (`id_token`) |
-| `magic-link` | Autenticación passwordless |
+| `magic-link` | Autenticación passwordless por enlace |
+| `email-code` | Autenticación passwordless por código (email OTP): entrar o crear la cuenta con un código |
 | `behaviors` | Configuración por app que cambia los flujos |
 | `users` | CRUD de usuario, metadata y cambio de email |
 | `roles-policies` | RBAC: roles y políticas |

@@ -101,6 +101,20 @@ Formato: ver [response-format.md](response-format.md)
 
 ---
 
+## Código de acceso por correo
+
+| Scope | HTTP | Acción |
+|-------|------|--------|
+| `email_code.disabled` | 422 | Activar behavior |
+| `email_code.cooldown` | 429 | Esperar `resend_cooldown_seconds` y reintentar |
+| `email_code.rate_limit_exceeded` | 429 | Esperar la ventana |
+| `email_code.invalid` | 401 | Código equivocado; `error.meta.remaining_attempts` dice cuántos quedan |
+| `email_code.attempts_exceeded` | 401 | Intentos agotados: pedir código nuevo |
+| `email_code.expired` / `email_code.superseded` / `email_code.already_used` | 401 | Pedir código nuevo |
+| `email_code.binding_mismatch` | 401 | Canjear desde la misma IP / navegador |
+
+---
+
 ## Patrón implementación
 
 ```typescript

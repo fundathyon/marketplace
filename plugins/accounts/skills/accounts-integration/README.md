@@ -19,7 +19,8 @@ No necesitas clonar el repo de accounts: copia esta carpeta y listo.
 | `email-auth.md` | Signup, signin, activate, reset |
 | `tokens.md` | Refresh, validate, revoke |
 | `oauth.md` | Web redirect + native SDK |
-| `magic-link.md` | Passwordless |
+| `magic-link.md` | Passwordless por enlace |
+| `email-code.md` | Passwordless por código (email OTP) |
 | `behaviors.md` | Config que cambia flujos |
 | `users.md` | Usuarios, metadata, change-email |
 | `roles-policies.md` | RBAC admin |

@@ -7,10 +7,6 @@
             "name": "Foundathyon",
             "url": "https://docs.foundathyon.com"
         },
-        "license": {
-            "name": "Apache 2.0",
-            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-        },
         "version": "1.0"
     },
     "host": "localhost:8000",
@@ -548,6 +544,82 @@
                         "description": "Lista de behaviors disponibles con nombres, descripciones localizadas y links a ejemplos",
                         "schema": {
                             "$ref": "#/definitions/dtos.AvailableBehaviorsResponseDTO"
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/app-behaviors/email/email-code/activate": {
+            "post": {
+                "description": "Activa y configura la estrategia de código de acceso por email (email_code) dentro del behavior email_auth. Si el nodo email_code no existe en la config, se crea. Todos los campos son opcionales y solo se actualizan si se proporcionan; el flag enabled se default a true cuando no se especifica. code_size admite 4–12, ttl_seconds 60–3600, max_verify_attempts 1–20, resend_cooldown_seconds 0–3600; code_type es numeric, alphanumeric o alphanumeric_special.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comportamientos de Aplicación"
+                ],
+                "summary": "Activar email_code de email_auth",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API Key secreta de la aplicación",
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Configuración de email_code (todos los campos son opcionales)",
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ActivateEmailAuthEmailCodeDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "email_code activado exitosamente",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Datos de entrada inválidos",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "API Key inválida",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Behavior email_auth no encontrado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "fixed_code no permitido en este entorno o con forma inválida",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
                         }
                     },
                     "500": {
@@ -1543,6 +1615,136 @@
                     },
                     "500": {
                         "description": "Error interno del servidor",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/emails/email-code/claim": {
+            "post": {
+                "description": "Recibe el challenge_id que devolvió /request y el código que tecleó el usuario. Cuenta el intento de forma atómica (max_verify_attempts por código), compara en tiempo constante, marca el código usado y emite access_token + refresh_token JWT. Un challenge desconocido responde igual que un código equivocado.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Emails - Email Code"
+                ],
+                "summary": "Canjear un código de acceso por email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API Key pública de la aplicación",
+                        "name": "X-API-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "challenge_id + code",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.ClaimEmailCodeDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Login (usuario existente)",
+                        "schema": {
+                            "$ref": "#/definitions/services.EmailCodeClaimResponse"
+                        }
+                    },
+                    "201": {
+                        "description": "Signup (usuario recién creado vía email code)",
+                        "schema": {
+                            "$ref": "#/definitions/services.EmailCodeClaimResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "challenge_id o code vacíos",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "Código inválido (meta.remaining_attempts), expirado, ya usado, reemplazado por uno más nuevo, intentos agotados o binding mismatch",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Email code no está habilitado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/emails/email-code/request": {
+            "post": {
+                "description": "Genera un código corto de un solo uso y lo envía al email del usuario. Si el email no existe en la app y auto_signup está activado, crea User+Email+LoginMethod automáticamente. Siempre responde 200 con un challenge_id (anti-enumeration), incluso cuando el email no existe y auto_signup está desactivado. El frontend guarda el challenge_id en la misma pestaña y lo presenta al canjear.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Emails - Email Code"
+                ],
+                "summary": "Solicitar un código de acceso por email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API Key pública de la aplicación",
+                        "name": "X-API-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Email del usuario",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.RequestEmailCodeDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Código generado (o silencio anti-enumeration): challenge_id + expires_in",
+                        "schema": {
+                            "$ref": "#/definitions/services.EmailCodeRequestResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Email malformado",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Email code no está habilitado para esta app",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "429": {
+                        "description": "Cooldown de reenvío activo o demasiadas solicitudes para este email",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -4075,7 +4277,7 @@
                         "AdminApiKey": []
                     }
                 ],
-                "description": "Retorna todas las variables de entorno cargadas. Solo activo si EXPOSE_ENV=true. Campos sensibles aparecen enmascarados.",
+                "description": "Retorna la configuración efectiva del proceso con los valores sensibles enmascarados. Requiere Admin API Key, EXPOSE_ENV=true y un ENVIRONMENT que no sea de producción. No existe forma de obtener los valores en claro.",
                 "produces": [
                     "application/json"
                 ],
@@ -4547,7 +4749,7 @@
                 }
             },
             "delete": {
-                "description": "Elimina el usuario autenticado y todos sus datos relacionados (emails, tokens, métodos de login)",
+                "description": "Elimina el usuario autenticado y todos sus datos relacionados (emails, tokens, métodos de login). Requiere X-API-KEY (Public API Key) y Bearer Access Token, igual que DELETE /api/v1/users/me; solo se puede eliminar la cuenta del usuario identificado por el token y únicamente si pertenece a la aplicación de la API key. Se mantiene por compatibilidad: usa /api/v1/users/me.",
                 "consumes": [
                     "application/json"
                 ],
@@ -4557,11 +4759,18 @@
                 "tags": [
                     "Usuarios"
                 ],
-                "summary": "Eliminar usuario",
+                "summary": "Eliminar usuario (alias de DELETE /api/v1/users/me)",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Bearer token JWT",
+                        "description": "Public API Key de la aplicación",
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Bearer access token JWT del usuario",
                         "name": "Authorization",
                         "in": "header",
                         "required": true
@@ -4576,7 +4785,14 @@
                         }
                     },
                     "401": {
-                        "description": "Token inválido o expirado",
+                        "description": "API Key o token inválidos",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "403": {
+                        "description": "Usuario no pertenece a la aplicación",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -5865,6 +6081,67 @@
                 }
             }
         },
+        "/v1/apps/{id}": {
+            "delete": {
+                "description": "Baja lógica de una aplicación: la marca como eliminada y desactiva sus API Keys, con lo que dejan de autenticar. Los datos de la app no se borran. Llamarlo dos veces es inocuo. Requiere autenticación con API Key de administración.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Aplicaciones"
+                ],
+                "summary": "Dar de baja una aplicación",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API Key de administración",
+                        "name": "X-Admin-API-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID de la aplicación",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Aplicación dada de baja",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "API Key inválida o no proporcionada",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "Aplicación no encontrada",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/v1/emails/signup": {
             "post": {
                 "description": "Misma semántica que POST /api/v1/emails/signup pero expuesta bajo el prefijo /v1/emails para clientes legacy. Reenvía internamente al handler de signup. Requiere X-API-KEY pública (pk_xxx).",
@@ -5969,6 +6246,87 @@
                 "email": {
                     "type": "string",
                     "example": "user@example.com"
+                }
+            }
+        },
+        "dtos.ActivateEmailAuthEmailCodeDTO": {
+            "type": "object",
+            "properties": {
+                "auto_signup": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "bind_to_ip": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "bind_to_user_agent": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "code_size": {
+                    "description": "CodeSize es el largo del código: entre 4 y 12 caracteres. Default 6.",
+                    "type": "integer",
+                    "example": 6
+                },
+                "code_strategy": {
+                    "description": "CodeStrategy controla cómo se genera el código: \"random\" (default) o\n\"fixed\".",
+                    "type": "string",
+                    "enum": [
+                        "random",
+                        "fixed"
+                    ],
+                    "example": "random"
+                },
+                "code_type": {
+                    "description": "CodeType es el alfabeto del código: numeric (dígitos), alphanumeric\n(mayúsculas y dígitos sin los caracteres que se confunden) o\nalphanumeric_special (lo anterior más símbolos). Default numeric.",
+                    "type": "string",
+                    "enum": [
+                        "numeric",
+                        "alphanumeric",
+                        "alphanumeric_special"
+                    ],
+                    "example": "numeric"
+                },
+                "email_branding": {
+                    "$ref": "#/definitions/dtos.EmailBrandingDTO"
+                },
+                "enabled": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "fixed_code": {
+                    "description": "FixedCode es el código que se devuelve siempre cuando code_strategy =\n\"fixed\". ⚠️ TESTING ONLY: solo se acepta cuando ENVIRONMENT es local,\ndevelopment, staging, qa o test; en cualquier otro (producción incluida)\nla activación responde 422.",
+                    "type": "string",
+                    "example": "123456"
+                },
+                "max_attempts_per_window": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "max_verify_attempts": {
+                    "description": "MaxVerifyAttempts es cuántos canjes fallidos admite un código antes de\ninvalidarse: entre 1 y 20. Default 5.",
+                    "type": "integer",
+                    "example": 5
+                },
+                "resend_cooldown_seconds": {
+                    "description": "ResendCooldownSeconds es cuánto esperar entre dos envíos al mismo\ncorreo: entre 0 (sin cooldown) y 3600 s. Default 60.",
+                    "type": "integer",
+                    "example": 60
+                },
+                "single_active_code": {
+                    "description": "SingleActiveCode hace que pedir un código nuevo deje sin efecto el\nanterior. Default true.",
+                    "type": "boolean",
+                    "example": true
+                },
+                "ttl_seconds": {
+                    "description": "TTLSeconds es la vigencia del código: entre 60 y 3600 s. Default 600.",
+                    "type": "integer",
+                    "example": 600
+                },
+                "window_seconds": {
+                    "type": "integer",
+                    "example": 600
                 }
             }
         },
@@ -6169,6 +6527,23 @@
                     "description": "Idioma utilizado para las traducciones (es, en)",
                     "type": "string",
                     "example": "en"
+                }
+            }
+        },
+        "dtos.ClaimEmailCodeDTO": {
+            "type": "object",
+            "required": [
+                "challenge_id",
+                "code"
+            ],
+            "properties": {
+                "challenge_id": {
+                    "type": "string",
+                    "example": "2f7c1e9a-4b3d-4c1e-9f8a-1d2e3f4a5b6c"
+                },
+                "code": {
+                    "type": "string",
+                    "example": "482913"
                 }
             }
         },
@@ -6669,6 +7044,18 @@
                 }
             }
         },
+        "dtos.RequestEmailCodeDTO": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                }
+            }
+        },
         "dtos.RequestMagicLinkDTO": {
             "type": "object",
             "required": [
@@ -7037,6 +7424,45 @@
                     "description": "Version indicates the service version\n@Example 1.0.0",
                     "type": "string",
                     "example": "1.0.0"
+                }
+            }
+        },
+        "services.EmailCodeClaimResponse": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/services.EmailCodeClaimUserBlock"
+                }
+            }
+        },
+        "services.EmailCodeClaimUserBlock": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "is_new": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "services.EmailCodeRequestResponse": {
+            "type": "object",
+            "properties": {
+                "challenge_id": {
+                    "type": "string"
+                },
+                "expires_in": {
+                    "type": "integer"
                 }
             }
         },
