@@ -1,0 +1,11 @@
+{
+  "name": "accounts",
+  "version": "0.1.0",
+  "description": "Integrate Foundathyon Accounts: signup, signin, refresh tokens, OAuth, magic link, webhooks, roles and behaviors — from the real routes, headers and response envelope.",
+  "author": {
+    "name": "Foundathyon",
+    "url": "https://github.com/fundathyon"
+  },
+  "repository": "https://github.com/fundathyon/marketplace",
+  "keywords": ["accounts", "authentication", "oauth", "magic-link", "webhooks", "foundathyon"]
+}

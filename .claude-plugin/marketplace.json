@@ -1,0 +1,21 @@
+{
+  "name": "foundathyon",
+  "owner": {
+    "name": "Foundathyon",
+    "url": "https://github.com/fundathyon"
+  },
+  "metadata": {
+    "description": "Foundathyon's integration skills for coding agents — install a service's real API docs into Claude Code, Cursor, Codex or Copilot.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "accounts",
+      "source": "./plugins/accounts",
+      "description": "Integrate Foundathyon Accounts: signup, signin, refresh tokens, OAuth, magic link, webhooks, roles and behaviors — from the real routes, headers and response envelope.",
+      "version": "0.1.0",
+      "category": "integration",
+      "keywords": ["accounts", "authentication", "oauth", "magic-link", "webhooks", "foundathyon"]
+    }
+  ]
+}
