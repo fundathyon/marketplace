@@ -57,6 +57,7 @@ Content-Type: application/json
 | `POST /api/v1/roles` | — | ✅ | — | — | — |
 | `POST /api/v1/app-behaviors` | — | ✅ | — | — | — |
 | `DELETE /api/v1/users/me` | ✅ | — | — | ✅ | — |
+| `DELETE /api/v1/users` | ✅ | — | — | ✅ | — |
 | `GET /api/v1/webhooks` | — | ✅ | — | — | — |
 
 ## Validar keys

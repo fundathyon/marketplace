@@ -110,4 +110,5 @@ curl -X GET "{BASE_URL}/api/v1/refresh-jwt" \
 - Verificación email ON → [email-auth.md](email-auth.md) + [behaviors.md](behaviors.md)
 - OAuth → [oauth.md](oauth.md)
 - Magic link → [magic-link.md](magic-link.md)
+- Código de acceso por correo → [email-code.md](email-code.md)
 - Errores → [error-scopes.md](error-scopes.md)

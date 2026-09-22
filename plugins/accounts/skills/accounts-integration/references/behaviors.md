@@ -9,6 +9,7 @@ Config JSON por app que activa/desactiva funcionalidades:
 - Verificación de email en signup/signin
 - Política de contraseñas
 - Magic link
+- Código de acceso por correo (email OTP)
 - OAuth providers
 - Metadata schema en signup
 - Notificaciones email
@@ -75,6 +76,19 @@ curl -X POST "{BASE_URL}/api/v1/app-behaviors/email/magic-link/activate" \
 ```
 
 Ver [magic-link.md](magic-link.md).
+
+---
+
+## Código de acceso por correo (admin)
+
+```bash
+curl -X POST "{BASE_URL}/api/v1/app-behaviors/email/email-code/activate" \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: {secret_key}" \
+  -d '{ "enabled": true, "code_size": 6, "code_type": "numeric", "ttl_seconds": 600, "max_verify_attempts": 5 }'
+```
+
+Configurable por app: largo (4–12) y alfabeto del código, vigencia (60–3600 s), intentos por código (1–20), cooldown de reenvío, envíos por ventana, `auto_signup`, un solo código activo, binding a IP/User-Agent y branding del correo. Ver [email-code.md](./email-code.md).
 
 ---
 

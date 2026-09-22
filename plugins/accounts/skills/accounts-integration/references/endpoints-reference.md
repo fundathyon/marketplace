@@ -55,6 +55,8 @@ Contrato detallado (schemas, params): [openapi.json](../assets/openapi.json)
 | POST | `/api/v1/emails/reset/set-password` | Bearer | Nueva password |
 | POST | `/api/v1/emails/magic-link/request` | Public | Solicitar magic link |
 | POST | `/api/v1/emails/magic-link/claim` | Public | Canjear magic link |
+| POST | `/api/v1/emails/email-code/request` | Public | Solicitar código de acceso por correo |
+| POST | `/api/v1/emails/email-code/claim` | Public | Canjear código de acceso (challenge_id + code) |
 
 ---
 
@@ -93,7 +95,7 @@ Contrato detallado (schemas, params): [openapi.json](../assets/openapi.json)
 |--------|------|------|-------------|
 | GET | `/api/v1/users` | — | Listar |
 | POST | `/api/v1/users` | Secret | Crear |
-| DELETE | `/api/v1/users` | Bearer | Eliminar (auth) |
+| DELETE | `/api/v1/users` | Public + Bearer | Eliminar (auth) — alias de /me |
 | DELETE | `/api/v1/users/me` | Public + Bearer | Self-delete |
 | DELETE | `/api/v1/users/:id` | Secret | Eliminar por ID |
 | PATCH | `/api/v1/users/:id/role` | Secret | Cambiar rol |
@@ -128,6 +130,7 @@ Contrato detallado (schemas, params): [openapi.json](../assets/openapi.json)
 | POST | `/api/v1/app-behaviors/email/verification/activate` | Secret |
 | POST | `/api/v1/app-behaviors/email/verification/deactivate` | Secret |
 | POST | `/api/v1/app-behaviors/email/magic-link/activate` | Secret |
+| POST | `/api/v1/app-behaviors/email/email-code/activate` | Secret |
 | POST | `/api/v1/app-behaviors/email/metadata-schema/activate` | Secret |
 
 ---

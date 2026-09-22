@@ -37,14 +37,20 @@ curl -X DELETE "{BASE_URL}/api/v1/users/me" \
 ## Eliminar usuario (admin o self)
 
 ```bash
-# Por JWT autenticado
+# Por JWT autenticado — alias de /api/v1/users/me.
+# Exige también la publishable key: sin ella responde 401.
 curl -X DELETE "{BASE_URL}/api/v1/users" \
+  -H "X-API-Key: {publishable_key}" \
   -H "Authorization: Bearer {access_token}"
 
 # Por ID (admin secret)
 curl -X DELETE "{BASE_URL}/api/v1/users/{user_id}" \
   -H "X-API-Key: {secret_key}"
 ```
+
+> `DELETE /api/v1/users` y `DELETE /api/v1/users/me` son el mismo camino: borran
+> la cuenta del dueño del access token y sólo si pertenece a la app de la
+> publishable key. Para código nuevo usa `/me`.
 
 ---
 

@@ -56,6 +56,19 @@ Guía completa: [magic-link.md](magic-link.md)
 
 ---
 
+## 2b. Código de acceso por correo (passwordless, email OTP)
+
+Requiere behavior `email_code` activado en la app. Misma familia que el magic link: el código para escribirlo en la misma pantalla, el enlace para abrir en otro dispositivo. Sirve para entrar y para crear la cuenta (`auto_signup`).
+
+```
+POST /api/v1/emails/email-code/request  { email }                 → 200 { challenge_id, expires_in }
+POST /api/v1/emails/email-code/claim    { challenge_id, code }    → tokens + user.is_new
+```
+
+Guía completa: [email-code.md](./email-code.md)
+
+---
+
 ## 3. OAuth web (redirect)
 
 ```
@@ -136,7 +149,8 @@ Alternativa legacy: `reset-confirm`
 | `verification.enabled = false` | Signup → signin directo |
 | `verification.enabled = true` | Signup → activate → signin |
 | Password policy | Validar antes de submit; errores `emails.validation.weak_password` |
-| Magic link activo | Ofrecer flujo passwordless |
+| Magic link activo | Ofrecer flujo passwordless por enlace |
+| Email code activo | Ofrecer flujo passwordless por código (misma pantalla) |
 | OAuth config activo | Mostrar botones sociales + redirect o native |
 | Metadata schema | Signup/signin puede requerir `metadata` |
 
