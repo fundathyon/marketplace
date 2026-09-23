@@ -61,7 +61,9 @@ curl -X POST "{BASE_URL}/api/v1/emails/magic-link/claim" \
   }'
 ```
 
-Respuesta: `access_token`, `refresh_token` — guardar en storage seguro, **nunca** en URL.
+Respuesta: `access_token`, `refresh_token`, `user.is_new` (`true` y HTTP **201** cuando la cuenta se creó o entró por primera vez; `false` y **200** cuando ya existía) — guardar los tokens en storage seguro, **nunca** en URL.
+
+Un correo de una cuenta nacida por OAuth (Google, Apple…) con correo verificado por el proveedor **no crea otra cuenta**: el request cuelga la identidad de correo del mismo usuario y el claim responde 200, `is_new: false`, con el `user.id` de siempre.
 
 Luego redirigir a `redirect_path`.
 

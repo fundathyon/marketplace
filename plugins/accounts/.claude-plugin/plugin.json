@@ -1,6 +1,6 @@
 {
   "name": "accounts",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Integra Foundathyon Accounts: signup, signin, refresh token, OAuth, magic link, código de acceso por correo (email OTP), webhooks, roles y behaviors — con las rutas, headers y formato de respuesta reales.",
   "author": {
     "name": "Foundathyon",

@@ -91,6 +91,8 @@ Respuesta: `access_token`, `refresh_token`, `user.is_new` (`true` y HTTP **201**
 
 `user.is_new = true` también dispara el webhook `accounts.user.signup`: la cuenta se anuncia en el primer canje, no al pedir el código.
 
+Un correo de una cuenta nacida por OAuth (Google, Apple…) con correo verificado por el proveedor **no crea otra cuenta**: el request cuelga la identidad de correo del mismo usuario y el claim responde 200, `is_new: false`, con el `user.id` de siempre.
+
 | HTTP | `scope` | Qué hacer |
 |------|---------|-----------|
 | 401 | `email_code.invalid` | Código equivocado (o challenge desconocido). `error.meta.remaining_attempts` dice cuántos quedan |

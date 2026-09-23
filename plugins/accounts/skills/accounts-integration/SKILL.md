@@ -6,7 +6,7 @@ description: >-
   por correo (email OTP), webhooks, roles y behaviors. Skill portable — no
   requiere el repo de accounts.
 metadata:
-  version: "0.2.0"
+  version: "0.2.1"
 ---
 
 # Foundathyon Accounts API — skill completo de integración
