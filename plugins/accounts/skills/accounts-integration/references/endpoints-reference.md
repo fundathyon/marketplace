@@ -93,17 +93,37 @@ Contrato detallado (schemas, params): [openapi.json](../assets/openapi.json)
 
 | Método | Ruta | Auth | Descripción |
 |--------|------|------|-------------|
-| GET | `/api/v1/users` | — | Listar |
+| GET | `/api/v1/users` | Secret o Admin | Listar; `?is_test=true\|false` separa testers de personas |
 | POST | `/api/v1/users` | Secret | Crear |
 | DELETE | `/api/v1/users` | Public + Bearer | Eliminar (auth) — alias de /me |
 | DELETE | `/api/v1/users/me` | Public + Bearer | Self-delete |
 | DELETE | `/api/v1/users/:id` | Secret | Eliminar por ID |
-| PATCH | `/api/v1/users/:id/role` | Secret | Cambiar rol |
+| PATCH | `/api/v1/users/:id/role` | Secret | Cambiar rol (409 `testers.role_locked` en un tester) |
+| POST | `/api/v1/users/:id/set-password` | Secret | Fijar contraseña (409 `testers.password_managed` en un tester) |
 | POST | `/api/v1/users/exist` | Public | ¿Existe email? |
 | PATCH | `/api/v1/users/me/metadata` | Bearer | Metadata propia |
 | PATCH | `/api/v1/users/:id/metadata` | Secret | Metadata admin |
 | POST | `/api/v1/users/change-email/request` | Public + Bearer | Solicitar cambio |
 | POST | `/api/v1/users/change-email/confirm` | Public + Bearer | Confirmar cambio |
+
+---
+
+## Testers (usuarios de prueba)
+
+Todos con **secret key**; requieren `email_auth.testers` activo. Ver [testers.md](testers.md).
+
+| Método | Ruta | Auth | Descripción |
+|--------|------|------|-------------|
+| POST | `/api/v1/testers` | Secret | Crear uno (`ttl` obligatorio) |
+| POST | `/api/v1/testers/bulk` | Secret | Crear 1–200 (`realistic` o `pattern`) |
+| GET | `/api/v1/testers` | Secret | Listar (`status`, `page`, `size`) |
+| GET | `/api/v1/testers/credentials` | Secret | Contraseñas de todos (`format=json\|csv`) |
+| GET | `/api/v1/testers/:id/credentials` | Secret | Contraseña de uno |
+| POST | `/api/v1/testers/regenerate` | Secret | Re-hashear tras rotar `SECRET_PASSWORD` |
+| PATCH | `/api/v1/testers/:id/expiry` | Secret | Alargar o revivir (`ttl`) |
+| POST | `/api/v1/testers/:id/token` | Secret | Par de tokens sin contraseña |
+| DELETE | `/api/v1/testers/:id` | Secret | Borrar uno |
+| DELETE | `/api/v1/testers` | Secret | Borrar en lote (`status`, `confirm=true`) |
 
 ---
 
@@ -131,6 +151,7 @@ Contrato detallado (schemas, params): [openapi.json](../assets/openapi.json)
 | POST | `/api/v1/app-behaviors/email/verification/deactivate` | Secret |
 | POST | `/api/v1/app-behaviors/email/magic-link/activate` | Secret |
 | POST | `/api/v1/app-behaviors/email/email-code/activate` | Secret |
+| POST | `/api/v1/app-behaviors/email/testers/activate` | Secret |
 | POST | `/api/v1/app-behaviors/email/metadata-schema/activate` | Secret |
 
 ---

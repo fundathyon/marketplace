@@ -28,6 +28,7 @@ Formato: ver [response-format.md](response-format.md)
 | `emails.validation.invalid_email` | 422 | Corregir email |
 | `emails.signup.app_not_found` | 404 | Revisar API key |
 | `auth.apikey.invalid` | 401 | Revisar publishable_key / entorno |
+| `emails.reserved_domain` | 422 | `@getfoundathyon.mock` es de los testers (también en pending-registrations y login social) |
 
 ---
 
@@ -48,6 +49,7 @@ Formato: ver [response-format.md](response-format.md)
 | `emails.signin.account_locked` | 403 | Bloqueo temporal |
 | `emails.signin.account_inactive` | 403 | → activate / resend-code |
 | `emails.signin.app_disabled` | 403 | Error config app |
+| `testers.expired` | 403 | Usuario de prueba caducado: revivirlo (ver Testers) |
 
 ---
 
@@ -79,6 +81,7 @@ Formato: ver [response-format.md](response-format.md)
 | Access inválido/expirado | 401 | → refresh-jwt |
 | Refresh inválido | 401 | → re-login |
 | Refresh revocado | 404 | → re-login |
+| `testers.expired` | 403 | Dueño tester caducado: re-login no basta, hay que revivirlo |
 
 ---
 
@@ -112,6 +115,26 @@ Formato: ver [response-format.md](response-format.md)
 | `email_code.attempts_exceeded` | 401 | Intentos agotados: pedir código nuevo |
 | `email_code.expired` / `email_code.superseded` / `email_code.already_used` | 401 | Pedir código nuevo |
 | `email_code.binding_mismatch` | 401 | Canjear desde la misma IP / navegador |
+
+---
+
+## Testers (usuarios de prueba)
+
+| Scope | HTTP | Acción |
+|-------|------|--------|
+| `testers.disabled` | 422 | Activar `email_auth.testers` |
+| `testers.username_taken` | 409 | Otro `user_name`/patrón; lista en `error.meta.user_names` |
+| `testers.not_found` | 404 | El id no es un tester de la app |
+| `testers.expired` | 403 | `PATCH /api/v1/testers/{id}/expiry` y volver a iniciar sesión |
+| `testers.password_managed` | 409 | Contraseña derivada: leerla de `/credentials`, no cambiarla (set-password, reset, reset-confirm, reset/validate-code) |
+| `testers.role_locked` | 409 | El rol de un tester es siempre `default` |
+| `testers.confirm_required` | 422 | Añadir `confirm=true` al borrado en lote |
+| `testers.password_policy` | 422 | La política de contraseñas de la app no se puede cumplir |
+| `testers.invalid_input` / `dto.validate.*` | 422 | Corregir `ttl`, `mode`, `pattern`, `status`… |
+| `testers.lookup_error`, `testers.error_saving`, `testers.error_hashing_password`, `testers.error_generating_tokens` | 500 | Reintentar; loguear `trace_id` |
+| `users.list.invalid_is_test` | 400 | `is_test` solo admite `true`/`false` |
+
+`POST /users/{id}/set-password` y `PATCH /users/{id}/role` devuelven el scope en `errors[0].scope` (envoltura antigua).
 
 ---
 

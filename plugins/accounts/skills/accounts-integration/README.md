@@ -23,6 +23,7 @@ No necesitas clonar el repo de accounts: copia esta carpeta y listo.
 | `email-code.md` | Passwordless por código (email OTP) |
 | `behaviors.md` | Config que cambia flujos |
 | `users.md` | Usuarios, metadata, change-email |
+| `testers.md` | Usuarios de prueba (testers) |
 | `roles-policies.md` | RBAC admin |
 | `webhooks.md` | Eventos HTTP |
 | `endpoints-reference.md` | Tabla completa endpoints |
