@@ -10,6 +10,7 @@ Config JSON por app que activa/desactiva funcionalidades:
 - Política de contraseñas
 - Magic link
 - Código de acceso por correo (email OTP)
+- Usuarios de prueba (testers)
 - OAuth providers
 - Metadata schema en signup
 - Notificaciones email
@@ -89,6 +90,25 @@ curl -X POST "{BASE_URL}/api/v1/app-behaviors/email/email-code/activate" \
 ```
 
 Configurable por app: largo (4–12) y alfabeto del código, vigencia (60–3600 s), intentos por código (1–20), cooldown de reenvío, envíos por ventana, `auto_signup`, un solo código activo, binding a IP/User-Agent y branding del correo. Ver [email-code.md](./email-code.md).
+
+---
+
+## Testers (admin)
+
+Gate del módulo de usuarios de prueba (`email_auth.testers`, apagado por default):
+
+```bash
+curl -X POST "{BASE_URL}/api/v1/app-behaviors/email/testers/activate" \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: {secret_key}" \
+  -d '{}'
+```
+
+```json
+{ "testers": { "enabled": true } }
+```
+
+Apagado → `/api/v1/testers/*` responde `422 testers.disabled`; los testers ya creados siguen entrando. `{"enabled": false}` lo apaga. La contraseña derivada de los testers sigue la política `password` de este mismo behavior: si la cambias, llama `POST /api/v1/testers/regenerate`. Ver [testers.md](testers.md).
 
 ---
 

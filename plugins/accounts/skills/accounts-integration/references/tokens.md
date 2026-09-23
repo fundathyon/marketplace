@@ -58,6 +58,7 @@ Errores:
 |------|-------|--------|
 | 401 | Refresh inválido/expirado | Re-login |
 | 404 | Refresh revocado en DB | Re-login |
+| 403 | `testers.expired`: el usuario es un tester caducado | Revivirlo con `PATCH /api/v1/testers/{id}/expiry` y volver a iniciar sesión |
 
 ---
 
@@ -138,4 +139,5 @@ async function withAuth<T>(fn: (token: string) => Promise<T>): Promise<T> {
 - Firmados con **RSA** (claves configuradas en el servidor)
 - Access: corta duración
 - Refresh: larga duración; persistido en DB con `id` claim
+- **Testers:** el `exp` del access y del refresh nunca pasa del `expires_at` del tester, aunque la app emita tokens más largos. No asumas la vida configurada; lee `exp`. Ver [testers.md](testers.md)
 - Ver claims en payload JWT decodificado (base64)

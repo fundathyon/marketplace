@@ -60,6 +60,33 @@ Lista completa: `GET /api/v1/webhooks/events`
 
 ---
 
+## Payload de `accounts.user.signup`
+
+```json
+{
+  "type": "accounts.user.signup",
+  "source": "tester",
+  "app_id": "…",
+  "data": {
+    "user": {
+      "id": "…",
+      "name": "qa_1",
+      "email": "qa_1@getfoundathyon.mock",
+      "is_test": true,
+      "expires_at": "2026-09-30T18:00:00Z"
+    },
+    "auth": { "id": "…", "method": "email", "is_verify": true, "source": "tester" },
+    "roles": ["default"]
+  }
+}
+```
+
+- `data.user.is_test` y `data.user.expires_at` van **siempre** (`false` / `null` para una persona).
+- `data.auth.source: "tester"` solo cuando el usuario nació por el módulo de testers; un lote de N dispara N eventos.
+- Filtra por `is_test` para no contar testers como altas reales. Ver [testers.md](testers.md).
+
+---
+
 ## Integración típica
 
 ```

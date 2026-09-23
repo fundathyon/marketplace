@@ -60,8 +60,10 @@ curl -X DELETE "{BASE_URL}/api/v1/users/{user_id}" \
 curl -X PATCH "{BASE_URL}/api/v1/users/{user_id}/role" \
   -H "Content-Type: application/json" \
   -H "X-API-Key: {secret_key}" \
-  -d '{ "role_id": "..." }'
+  -d '{ "role": "admin" }'
 ```
+
+Sobre un usuario de prueba (tester) responde `409 testers.role_locked`: su rol es siempre `default`. Lo mismo con `POST /api/v1/users/{user_id}/set-password` → `409 testers.password_managed`. Ambos devuelven el scope en `errors[0].scope`.
 
 ---
 
@@ -111,8 +113,15 @@ curl -X POST "{BASE_URL}/api/v1/users/change-email/confirm" \
 
 ## Listar usuarios
 
+Requiere **secret key** (o `X-Admin-API-Key` + `app_id` en el query).
+
 ```bash
-curl "{BASE_URL}/api/v1/users?page=0&size=20"
+# Todos (como siempre)
+curl "{BASE_URL}/api/v1/users?page=0&size=20" -H "X-API-Key: {secret_key}"
+
+# Solo testers / solo personas
+curl "{BASE_URL}/api/v1/users?is_test=true"  -H "X-API-Key: {secret_key}"
+curl "{BASE_URL}/api/v1/users?is_test=false" -H "X-API-Key: {secret_key}"
 ```
 
-Consultar auth requerida en [openapi.json](../assets/openapi.json).
+Cada usuario lleva `is_test`, `expires_at` y `status` (`active` | `expired`, calculado). La respuesta omite los valores `null`: una persona llega sin `expires_at`. Un `is_test` distinto de `true`/`false` → `400 users.list.invalid_is_test`. Nunca incluye contraseñas. Los testers se gestionan en [testers.md](testers.md).
