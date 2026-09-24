@@ -60,6 +60,40 @@ Respuesta 201 (en lote, `data` es una lista de esto). **La contraseña solo viaj
 
 `user_name`: minúsculas, dígitos, `.`, `_`, `-`, hasta 64. Repetido → `409 testers.username_taken` con `error.meta.user_names`; en modo `pattern` no se crea ninguno.
 
+### Lotes grandes: trabajos (recomendado)
+
+`/bulk` responde al terminar (un lote grande topa con el timeout del proxy). Un trabajo responde **202** al instante y avanza en el servidor:
+
+```bash
+curl -X POST "{BASE_URL}/api/v1/testers/jobs" \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: {secret_key}" \
+  -d '{
+    "action": "create", "n_start": 1, "count": 150, "ttl": "1w",
+    "fields": {
+      "email":     {"mode": "pattern", "pattern": "qa_{n:03}"},
+      "user_name": {"mode": "mock", "kind": "first_last"},
+      "name":      {"mode": "mock", "kind": "full_name"},
+      "metadata":  {"team": {"mode": "fixed", "value": "QA"}}
+    },
+    "retry": {"attempts": 3, "backoff_seconds": 2}
+  }'
+# → 202 { "data": { "job_id": "…", "status": "queued" } }
+
+# Polling hasta status succeeded | failed | interrupted
+curl "{BASE_URL}/api/v1/testers/jobs/{job_id}" -H "X-API-Key: {secret_key}"
+# → { "data": { "status": "running", "total": 150, "done": 60, "params": {…, "seed": 48213},
+#               "result": { "created": 60, "created_ids": […], "skipped": 0, "skipped_items": [],
+#                           "notified": 58, "notify_pending": 2, "notify_failed": 0 } } }
+```
+
+- Campos: `email` (solo parte local; dominio fijo), `user_name`, `name`, `metadata.<key>`. `mode`: `pattern` (`{n}` o `{n:0W}` obligatorio), `mock` (`kind` de `GET /testers/mock-kinds`, determinista por `seed`+`n`, nombres de México) o `fixed` (`name`/metadata; en `email`/`user_name` solo con `count: 1`, y ese tester no guarda `test_seq`). Defaults: `user_name` mock `first_last`, `name` mock `full_name`, `email` = `user_name`.
+- `POST /testers/preview` con el mismo cuerpo → `{seed, n_start, count, items[5]}` (`email` completo); manda esa `seed` al trabajo para obtener lo mismo.
+- Un `user_name`/correo existente se salta (`result.skipped`); un tester que agota `retry.attempts` detiene el trabajo (`failed`, `failed_item: {n, error}`) sin revertir: relanzar el mismo rango completa lo que falta.
+- Cada tester numerado guarda su `n` en `test_seq`; `GET /testers?n_from=&n_to=&q=` filtra por rango y texto.
+- Masivos: `{"action": "delete", "confirm": true, "target": …}` y `{"action": "set_expiry", "ttl": "1mo", "target": …}`; `target` = exactamente uno de `{"ids": […]}`, `{"all": true}`, `{"filter": {"status", "n_from", "n_to", "q"}}` (≤ 1000 testers).
+- Hasta 2 trabajos corren a la vez por proceso; un reinicio deja el trabajo `interrupted`.
+
 ---
 
 ## 3. Credenciales
@@ -118,7 +152,7 @@ curl -X DELETE "{BASE_URL}/api/v1/testers/{id}" -H "X-API-Key: {secret_key}"    
 curl -X DELETE "{BASE_URL}/api/v1/testers?status=expired&confirm=true" -H "X-API-Key: {secret_key}"  # {deleted: N}
 ```
 
-`/testers` devuelve `status` y `ttl_remaining` (segundos) por elemento, paginado (`meta.pagination`). Los valores `null` se omiten de la respuesta: un tester `never` llega sin `expires_at` ni `ttl_remaining`. Sin `confirm=true` → `422 testers.confirm_required`. Cada borrado es en cascada y publica `user.deleted`.
+`/testers` devuelve `status`, `ttl_remaining` (segundos) y `test_seq` por elemento, acepta `n_from`, `n_to` y `q`, paginado (`meta.pagination`). Los valores `null` se omiten de la respuesta: un tester `never` llega sin `expires_at` ni `ttl_remaining`. Sin `confirm=true` → `422 testers.confirm_required`. Cada borrado es en cascada y publica `user.deleted`.
 
 ---
 
@@ -138,7 +172,7 @@ curl -X DELETE "{BASE_URL}/api/v1/testers?status=expired&confirm=true" -H "X-API
 
 ## 8. Webhook
 
-`accounts.user.signup` lleva en todas las altas `data.user.is_test` y `data.user.expires_at`; en las de testers, además, `data.auth.source: "tester"`. Un lote de N dispara N eventos. Úsalo para marcar y limpiar en tu sistema lo que nació como prueba. Ver [webhooks.md](webhooks.md).
+`accounts.user.signup` lleva en todas las altas `data.user.is_test` y `data.user.expires_at`; en las de testers, además, `data.auth.source: "tester"`. Un lote de N dispara N eventos, en la cola del webhook. Borrar testers envía `accounts.user.deleted` con `initiated_by: "admin"` a los webhooks suscritos. Úsalo para marcar y limpiar en tu sistema lo que nació como prueba. Ver [webhooks.md](webhooks.md).
 
 ---
 
@@ -152,7 +186,9 @@ curl -X DELETE "{BASE_URL}/api/v1/testers?status=expired&confirm=true" -H "X-API
 | `testers.expired` | 403 | `PATCH /testers/{id}/expiry` |
 | `testers.password_managed` | 409 | Usar `/credentials`, no cambiar la contraseña |
 | `testers.role_locked` | 409 | El rol es siempre `default` |
-| `testers.confirm_required` | 422 | Añadir `confirm=true` |
+| `testers.confirm_required` | 422 | Añadir `confirm=true` (o `"confirm": true` en un trabajo `delete`) |
+| `testers.invalid_input` | 422 | Cuerpo de trabajo/preview inválido: plantilla sin `{n}`, `count` 1–1000, `target` |
+| `testers.job_not_found` | 404 | El id no es un trabajo de la app |
 | `testers.password_policy` | 422 | La política de la app no se puede cumplir |
 | `emails.reserved_domain` | 422 | Dominio de testers en un flujo público |
 
@@ -160,5 +196,5 @@ curl -X DELETE "{BASE_URL}/api/v1/testers?status=expired&confirm=true" -H "X-API
 
 1. Nunca uses la secret key en frontend: los testers se crean y se leen desde backend, CI o scripts.
 2. No persistas contraseñas de testers en tu código: pídelas a `/credentials` cuando las necesites.
-3. Para seeds, prefiere `bulk` + `/token`; para probar la UI de login, `signin` con la contraseña descargada.
+3. Para seeds, prefiere un trabajo `create` (con polling) + `/token`; para probar la UI de login, `signin` con la contraseña descargada.
 4. Filtra `is_test` (o escucha `data.user.is_test` en el webhook) para no mezclar testers con métricas reales.
