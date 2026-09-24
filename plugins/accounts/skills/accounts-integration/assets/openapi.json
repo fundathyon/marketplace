@@ -4486,7 +4486,7 @@
         },
         "/api/v1/testers": {
             "get": {
-                "description": "Lista paginada de los testers de la app, cada uno con status (active | expired), ttl_remaining en segundos (ausente cuando no tiene vigencia) y test_seq (el n con el que nació, ausente si no es numerado). n_from y n_to dejan fuera a los testers sin n y ordenan por n. Nunca incluye contraseñas: para eso está /credentials.",
+                "description": "Lista paginada de los testers de la app, cada uno con status (active | expired), ttl_remaining en segundos (ausente cuando no tiene vigencia) y test_seq (el n con el que nació, ausente si no es numerado). n_from y n_to dejan fuera a los testers sin n y, sin order_by, ordenan por n. order_by y order eligen el orden; offset pide filas exactas de ese orden (para rangos de filas). Nunca incluye contraseñas: para eso está /credentials.",
                 "consumes": [
                     "application/json"
                 ],
@@ -4546,8 +4546,31 @@
                     {
                         "type": "integer",
                         "default": 0,
-                        "description": "Offset informativo para los enlaces de paginación",
+                        "description": "Desplazamiento exacto: si se manda, la página empieza en esa fila del orden (manda sobre page)",
                         "name": "offset",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "created_at",
+                            "test_seq",
+                            "user_name",
+                            "name",
+                            "expires_at"
+                        ],
+                        "type": "string",
+                        "description": "Ordena por created_at (default), test_seq, user_name, name o expires_at; los vacíos van al final",
+                        "name": "order_by",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ],
+                        "type": "string",
+                        "description": "asc (default) o desc",
+                        "name": "order",
                         "in": "query"
                     }
                 ],

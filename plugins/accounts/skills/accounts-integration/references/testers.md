@@ -87,7 +87,7 @@ curl "{BASE_URL}/api/v1/testers/jobs/{job_id}" -H "X-API-Key: {secret_key}"
 #                           "notified": 58, "notify_pending": 2, "notify_failed": 0 } } }
 ```
 
-- Campos: `email` (solo parte local; dominio fijo), `user_name`, `name`, `metadata.<key>`. `mode`: `pattern` (`{n}` o `{n:0W}` obligatorio), `mock` (`kind` de `GET /testers/mock-kinds`, determinista por `seed`+`n`, nombres de México) o `fixed` (`name`/metadata; en `email`/`user_name` solo con `count: 1`, y ese tester no guarda `test_seq`). Defaults: `user_name` mock `first_last`, `name` mock `full_name`, `email` = `user_name`.
+- Campos: `email` (solo parte local; dominio fijo), `user_name`, `name`, `metadata.<key>`. `mode`: `pattern` (`{n}` o `{n:0W}` obligatorio), `mock` (`kind` de `GET /testers/mock-kinds`, determinista por `seed`+`n`, nombres de México; `email` y `user_name` salen sin número y solo si ya existen se les agrega `n` al final) o `fixed` (`name`/metadata; en `email`/`user_name` solo con `count: 1`, y ese tester no guarda `test_seq`). Defaults: `user_name` mock `first_last`, `name` mock `full_name`, `email` = `user_name`.
 - `POST /testers/preview` con el mismo cuerpo → `{seed, n_start, count, items[5]}` (`email` completo); manda esa `seed` al trabajo para obtener lo mismo.
 - Un `user_name`/correo existente se salta (`result.skipped`); un tester que agota `retry.attempts` detiene el trabajo (`failed`, `failed_item: {n, error}`) sin revertir: relanzar el mismo rango completa lo que falta.
 - Cada tester numerado guarda su `n` en `test_seq`; `GET /testers?n_from=&n_to=&q=` filtra por rango y texto.
@@ -152,7 +152,7 @@ curl -X DELETE "{BASE_URL}/api/v1/testers/{id}" -H "X-API-Key: {secret_key}"    
 curl -X DELETE "{BASE_URL}/api/v1/testers?status=expired&confirm=true" -H "X-API-Key: {secret_key}"  # {deleted: N}
 ```
 
-`/testers` devuelve `status`, `ttl_remaining` (segundos) y `test_seq` por elemento, acepta `n_from`, `n_to` y `q`, paginado (`meta.pagination`). Los valores `null` se omiten de la respuesta: un tester `never` llega sin `expires_at` ni `ttl_remaining`. Sin `confirm=true` → `422 testers.confirm_required`. Cada borrado es en cascada y publica `user.deleted`.
+`/testers` devuelve `status`, `ttl_remaining` (segundos) y `test_seq` por elemento, acepta `n_from`, `n_to` y `q`, ordena con `order_by` (`created_at`, `test_seq`, `user_name`, `name`, `expires_at`; vacíos al final) y `order` (`asc`/`desc`), paginado (`meta.pagination`); `offset` pide filas exactas de ese orden y manda sobre `page`. Los valores `null` se omiten de la respuesta: un tester `never` llega sin `expires_at` ni `ttl_remaining`. Sin `confirm=true` → `422 testers.confirm_required`. Cada borrado es en cascada y publica `user.deleted`.
 
 ---
 
