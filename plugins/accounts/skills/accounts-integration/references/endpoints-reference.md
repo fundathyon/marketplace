@@ -116,7 +116,7 @@ Todos con **secret key**; requieren `email_auth.testers` activo. Ver [testers.md
 |--------|------|------|-------------|
 | POST | `/api/v1/testers` | Secret | Crear uno (`ttl` obligatorio) |
 | POST | `/api/v1/testers/bulk` | Secret | Crear 1–200 (`realistic` o `pattern`) |
-| GET | `/api/v1/testers` | Secret | Listar (`status`, `n_from`, `n_to`, `q`, `page`, `size`) |
+| GET | `/api/v1/testers` | Secret | Listar (`status`, `n_from`, `n_to`, `q`, `order_by`, `order`, `page`, `size`, `offset`) |
 | GET | `/api/v1/testers/credentials` | Secret | Contraseñas de todos o de `ids=a,b` (`format=json\|csv`) |
 | GET | `/api/v1/testers/:id/credentials` | Secret | Contraseña de uno |
 | POST | `/api/v1/testers/regenerate` | Secret | Re-hashear tras rotar `SECRET_PASSWORD` |
