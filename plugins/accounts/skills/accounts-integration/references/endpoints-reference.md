@@ -116,14 +116,19 @@ Todos con **secret key**; requieren `email_auth.testers` activo. Ver [testers.md
 |--------|------|------|-------------|
 | POST | `/api/v1/testers` | Secret | Crear uno (`ttl` obligatorio) |
 | POST | `/api/v1/testers/bulk` | Secret | Crear 1–200 (`realistic` o `pattern`) |
-| GET | `/api/v1/testers` | Secret | Listar (`status`, `page`, `size`) |
-| GET | `/api/v1/testers/credentials` | Secret | Contraseñas de todos (`format=json\|csv`) |
+| GET | `/api/v1/testers` | Secret | Listar (`status`, `n_from`, `n_to`, `q`, `page`, `size`) |
+| GET | `/api/v1/testers/credentials` | Secret | Contraseñas de todos o de `ids=a,b` (`format=json\|csv`) |
 | GET | `/api/v1/testers/:id/credentials` | Secret | Contraseña de uno |
 | POST | `/api/v1/testers/regenerate` | Secret | Re-hashear tras rotar `SECRET_PASSWORD` |
 | PATCH | `/api/v1/testers/:id/expiry` | Secret | Alargar o revivir (`ttl`) |
 | POST | `/api/v1/testers/:id/token` | Secret | Par de tokens sin contraseña |
 | DELETE | `/api/v1/testers/:id` | Secret | Borrar uno |
 | DELETE | `/api/v1/testers` | Secret | Borrar en lote (`status`, `confirm=true`) |
+| POST | `/api/v1/testers/jobs` | Secret | Trabajo en segundo plano (`create` hasta 1000, `delete` con `confirm`, `set_expiry`) → 202 `{job_id, status}` |
+| GET | `/api/v1/testers/jobs` | Secret | Listar trabajos, recientes primero (`page`, `size`) |
+| GET | `/api/v1/testers/jobs/:id` | Secret | Progreso: `status`, `total`, `done`, `params`, `failed_item`, `result` |
+| POST | `/api/v1/testers/preview` | Secret | Primeros 5 de un `create` + `seed` |
+| GET | `/api/v1/testers/mock-kinds` | Secret | `kind` de mock por campo con su `label` |
 
 ---
 
@@ -161,7 +166,7 @@ Todos con **secret key**; requieren `email_auth.testers` activo. Ver [testers.md
 | Método | Ruta | Auth |
 |--------|------|------|
 | GET | `/api/v1/webhooks/events` | — |
-| GET/POST | `/api/v1/webhooks` | Secret |
+| GET/POST | `/api/v1/webhooks` | Secret (política de entrega: `retries`, `min_interval_ms`, `backoff`, `honor_retry_after`) |
 
 ---
 

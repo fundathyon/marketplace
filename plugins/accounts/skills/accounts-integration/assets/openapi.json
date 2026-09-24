@@ -4486,7 +4486,7 @@
         },
         "/api/v1/testers": {
             "get": {
-                "description": "Lista paginada de los testers de la app, cada uno con status (active | expired) y ttl_remaining en segundos (ausente cuando no tiene vigencia). Nunca incluye contraseñas: para eso está /credentials.",
+                "description": "Lista paginada de los testers de la app, cada uno con status (active | expired), ttl_remaining en segundos (ausente cuando no tiene vigencia) y test_seq (el n con el que nació, ausente si no es numerado). n_from y n_to dejan fuera a los testers sin n y ordenan por n. Nunca incluye contraseñas: para eso está /credentials.",
                 "consumes": [
                     "application/json"
                 ],
@@ -4509,6 +4509,24 @@
                         "type": "string",
                         "description": "Filtra por estado: active o expired; ausente, todos",
                         "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Solo testers con n (test_seq) mayor o igual",
+                        "name": "n_from",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Solo testers con n (test_seq) menor o igual",
+                        "name": "n_to",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Búsqueda libre en email, user_name, name e id",
+                        "name": "q",
                         "in": "query"
                     },
                     {
@@ -4770,7 +4788,7 @@
         },
         "/api/v1/testers/credentials": {
             "get": {
-                "description": "Recalcula la contraseña derivada de cada tester de la app y la devuelve junto con user_id, user_name, name, email, expires_at y status. format=json (default) responde la lista dentro de data; format=csv responde text/csv con Content-Disposition attachment; filename=\"testers-\u003capp_id\u003e.csv\". Nada se lee de la base: la contraseña se deriva de la app, el correo y la llave vigente.",
+                "description": "Recalcula la contraseña derivada de cada tester de la app y la devuelve junto con user_id, user_name, name, email, expires_at y status. format=json (default) responde la lista dentro de data; ids=a,b,c acota a esos testers (un id que no es tester de la app no aparece). format=csv responde text/csv con Content-Disposition attachment; filename=\"testers-\u003capp_id\u003e.csv\". Nada se lee de la base: la contraseña se deriva de la app, el correo y la llave vigente.",
                 "consumes": [
                     "application/json"
                 ],
@@ -4795,6 +4813,12 @@
                         "description": "json (default) o csv",
                         "name": "format",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Ids separados por coma (hasta 1000) para acotar la descarga a esos testers",
+                        "name": "ids",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -4814,6 +4838,327 @@
                     },
                     "422": {
                         "description": "Formato inválido, testers.disabled o testers.password_policy",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/testers/jobs": {
+            "get": {
+                "description": "Lista paginada de los trabajos de la app, recientes primero, con la misma forma que GET /api/v1/testers/jobs/{id}.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Testers"
+                ],
+                "summary": "Listar los trabajos de testers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Secret API Key de la aplicación",
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Número de página (desde 0)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Tamaño de página (máximo 100)",
+                        "name": "size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 0,
+                        "description": "Offset informativo para los enlaces de paginación",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de trabajos con meta.pagination",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "API Key inválida",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "Query inválido o testers.disabled",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Valida el cuerpo de forma síncrona, guarda el trabajo y responde 202 con su id sin esperar a que termine; el progreso se consulta con GET /api/v1/testers/jobs/{id}. action=create crea count testers (1 a 1000) para n desde n_start (default 1) con generadores por campo (fields.email solo la parte local, fields.user_name, fields.name y fields.metadata; mode pattern con {n} o {n:0W}, mock con kind, o fixed con value; fixed en email y user_name solo con count = 1, y ese tester no guarda test_seq), ttl obligatorio, retry {attempts: 3, backoff_seconds: 2} exponencial por tester y seed opcional (la de /preview reproduce los mismos valores). Un user_name o correo existente se salta (result.skipped); un tester que agota sus intentos detiene el trabajo (status failed, failed_item). action=delete exige confirm=true y un target; action=set_expiry exige target y ttl. target es exactamente uno de {ids: [...]}, {all: true} o {filter: {status, n_from, n_to, q}} y no puede seleccionar más de 1000 testers.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Testers"
+                ],
+                "summary": "Lanzar un trabajo de testers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Secret API Key de la aplicación",
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Acción y sus parámetros",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TesterJobDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "{job_id, status: queued}",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "API Key inválida",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "testers.invalid_input, testers.confirm_required, testers.disabled o testers.password_policy",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/testers/jobs/{id}": {
+            "get": {
+                "description": "Devuelve el trabajo con id, action, status (queued | running | succeeded | failed | interrupted), total, done, params (el cuerpo normalizado, con la seed), failed_item {n | id, error} cuando se detuvo, result (create: created, created_ids, skipped, skipped_items; delete: deleted, deleted_ids, ...; set_expiry: updated, updated_ids, ...; y notified / notify_pending cuando hubo avisos por webhook), created_at, started_at y finished_at.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Testers"
+                ],
+                "summary": "Consultar un trabajo de testers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Secret API Key de la aplicación",
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID del trabajo",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "El trabajo",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "API Key inválida",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "404": {
+                        "description": "testers.job_not_found: el id no es un trabajo de la app",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "testers.disabled",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/testers/mock-kinds": {
+            "get": {
+                "description": "Lista, por campo, los kind que admite mode=mock con su etiqueta en español: email (first.last, flast), user_name (first_last, handle), name (full_name, first; nombres es_MX) y metadata (city, company, job_title, phone).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Testers"
+                ],
+                "summary": "Tipos de dato mock por campo",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Secret API Key de la aplicación",
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{email: [{kind, label}], user_name: [...], name: [...], metadata: [...]}",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "API Key inválida",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "testers.disabled",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/testers/preview": {
+            "post": {
+                "description": "Recibe el mismo cuerpo que un trabajo create (action es opcional) y devuelve los primeros 5 testers que produciría (n, email, user_name, name, metadata) junto con la seed usada. Enviar esa seed en POST /api/v1/testers/jobs produce exactamente los mismos valores. No escribe nada.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Testers"
+                ],
+                "summary": "Vista previa de un trabajo create",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Secret API Key de la aplicación",
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Cuerpo de un trabajo create",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.TesterJobDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{seed, n_start, count, items}",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "API Key inválida",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "testers.invalid_input o testers.disabled",
                         "schema": {
                             "type": "object",
                             "additionalProperties": true
@@ -7711,6 +8056,11 @@
                     "type": "boolean",
                     "example": true
                 },
+                "backoff": {
+                    "description": "Backoff es la espera entre reintentos: linear (1 s, 2 s, 3 s…, el\ndefault) o exponential (2 s, 4 s, 8 s…).",
+                    "type": "string",
+                    "example": "linear"
+                },
                 "description": {
                     "type": "string",
                     "example": "Webhook para eventos de usuario"
@@ -7725,6 +8075,16 @@
                         "user.created",
                         "user.deleted"
                     ]
+                },
+                "honor_retry_after": {
+                    "description": "HonorRetryAfter respeta el Retry-After de un 429 o 503 (default true).",
+                    "type": "boolean",
+                    "example": true
+                },
+                "min_interval_ms": {
+                    "description": "MinIntervalMs es el espacio mínimo entre envíos a este webhook, en\nmilisegundos (0 a 60000, default 0).",
+                    "type": "integer",
+                    "example": 2500
                 },
                 "name": {
                     "type": "string",
@@ -7800,6 +8160,47 @@
                 "ttl": {
                     "type": "string",
                     "example": "1w"
+                }
+            }
+        },
+        "dtos.FieldSpecDTO": {
+            "type": "object",
+            "properties": {
+                "kind": {
+                    "type": "string",
+                    "example": "first_last"
+                },
+                "mode": {
+                    "type": "string",
+                    "example": "pattern"
+                },
+                "pattern": {
+                    "type": "string",
+                    "example": "tester_{n:03}"
+                },
+                "value": {
+                    "type": "string",
+                    "example": "QA"
+                }
+            }
+        },
+        "dtos.FieldsDTO": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "$ref": "#/definitions/dtos.FieldSpecDTO"
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/dtos.FieldSpecDTO"
+                    }
+                },
+                "name": {
+                    "$ref": "#/definitions/dtos.FieldSpecDTO"
+                },
+                "user_name": {
+                    "$ref": "#/definitions/dtos.FieldSpecDTO"
                 }
             }
         },
@@ -7997,6 +8398,19 @@
                 }
             }
         },
+        "dtos.RetryDTO": {
+            "type": "object",
+            "properties": {
+                "attempts": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "backoff_seconds": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
         "dtos.SetPasswordAdminDTO": {
             "type": "object",
             "required": [
@@ -8093,6 +8507,83 @@
                 "behavior_code": {
                     "type": "string",
                     "example": "email_auth"
+                }
+            }
+        },
+        "dtos.TargetDTO": {
+            "type": "object",
+            "properties": {
+                "all": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "filter": {
+                    "$ref": "#/definitions/dtos.TargetFilterDTO"
+                },
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "dtos.TargetFilterDTO": {
+            "type": "object",
+            "properties": {
+                "n_from": {
+                    "type": "integer",
+                    "example": 51
+                },
+                "n_to": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "q": {
+                    "type": "string",
+                    "example": "tester_"
+                },
+                "status": {
+                    "type": "string",
+                    "example": "expired"
+                }
+            }
+        },
+        "dtos.TesterJobDTO": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "example": "create"
+                },
+                "confirm": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "count": {
+                    "type": "integer",
+                    "example": 150
+                },
+                "fields": {
+                    "$ref": "#/definitions/dtos.FieldsDTO"
+                },
+                "n_start": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "retry": {
+                    "$ref": "#/definitions/dtos.RetryDTO"
+                },
+                "seed": {
+                    "type": "integer",
+                    "example": 48213
+                },
+                "target": {
+                    "$ref": "#/definitions/dtos.TargetDTO"
+                },
+                "ttl": {
+                    "type": "string",
+                    "example": "1w"
                 }
             }
         },
@@ -8193,6 +8684,10 @@
                     "type": "boolean",
                     "example": true
                 },
+                "backoff": {
+                    "type": "string",
+                    "example": "exponential"
+                },
                 "description": {
                     "type": "string",
                     "example": "Webhook para eventos de usuario"
@@ -8206,6 +8701,15 @@
                         "user.created",
                         "user.deleted"
                     ]
+                },
+                "honor_retry_after": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "min_interval_ms": {
+                    "description": "Política de entrega (ver CreateWebhookDTO).",
+                    "type": "integer",
+                    "example": 2500
                 },
                 "name": {
                     "type": "string",

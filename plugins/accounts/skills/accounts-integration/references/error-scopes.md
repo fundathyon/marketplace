@@ -128,9 +128,10 @@ Formato: ver [response-format.md](response-format.md)
 | `testers.expired` | 403 | `PATCH /api/v1/testers/{id}/expiry` y volver a iniciar sesión |
 | `testers.password_managed` | 409 | Contraseña derivada: leerla de `/credentials`, no cambiarla (set-password, reset, reset-confirm, reset/validate-code) |
 | `testers.role_locked` | 409 | El rol de un tester es siempre `default` |
-| `testers.confirm_required` | 422 | Añadir `confirm=true` al borrado en lote |
+| `testers.confirm_required` | 422 | Añadir `confirm=true` al borrado en lote (`"confirm": true` en un trabajo `delete`) |
+| `testers.job_not_found` | 404 | El id no es un trabajo de la app |
 | `testers.password_policy` | 422 | La política de contraseñas de la app no se puede cumplir |
-| `testers.invalid_input` / `dto.validate.*` | 422 | Corregir `ttl`, `mode`, `pattern`, `status`… |
+| `testers.invalid_input` / `dto.validate.*` | 422 | Corregir `ttl`, `mode`, `pattern` (debe llevar `{n}` o `{n:0W}`), `count` (1–1000), `target` (exactamente uno de `ids`, `all`, `filter`; ≤ 1000 testers), `status`… |
 | `testers.lookup_error`, `testers.error_saving`, `testers.error_hashing_password`, `testers.error_generating_tokens` | 500 | Reintentar; loguear `trace_id` |
 | `users.list.invalid_is_test` | 400 | `is_test` solo admite `true`/`false` |
 
