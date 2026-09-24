@@ -15,7 +15,7 @@ inventarlos y sin que tengas que pegarle la documentación en cada prompt.
 
 | Servicio | Plugin | Skill | Qué te da | Versión |
 | --- | --- | --- | --- | --- |
-| **Accounts** — cuentas y login | `accounts` | [`accounts-integration`](plugins/accounts/skills/accounts-integration/SKILL.md) | Signup, signin, refresh token, OAuth, magic link, código de acceso por correo, usuarios de prueba (testers), webhooks, roles y behaviors, integrados en tu código | 0.5.0 |
+| **Accounts** — cuentas y login | `accounts` | [`accounts-integration`](plugins/accounts/skills/accounts-integration/SKILL.md) | Signup, signin, refresh token, OAuth, magic link, código de acceso por correo, usuarios de prueba (testers), webhooks, roles y behaviors, integrados en tu código | 0.6.0 |
 
 Cada servicio nuevo de Foundathyon entra aquí como un plugin más y se instala
 igual. [Cómo recibirlo cuando salga](#cuando-foundathyon-publique-un-servicio-nuevo).

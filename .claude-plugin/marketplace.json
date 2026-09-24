@@ -13,7 +13,7 @@
       "name": "accounts",
       "source": "./plugins/accounts",
       "description": "Integra Foundathyon Accounts: signup, signin, refresh token, OAuth, magic link, código de acceso por correo (email OTP), usuarios de prueba (testers), webhooks, roles y behaviors — con las rutas, headers y formato de respuesta reales.",
-      "version": "0.5.0",
+      "version": "0.6.0",
       "category": "integration",
       "keywords": [
         "accounts",

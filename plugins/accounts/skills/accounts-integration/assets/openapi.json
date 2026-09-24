@@ -4486,7 +4486,7 @@
         },
         "/api/v1/testers": {
             "get": {
-                "description": "Lista paginada de los testers de la app, cada uno con status (active | expired), ttl_remaining en segundos (ausente cuando no tiene vigencia) y test_seq (el n con el que nació, ausente si no es numerado). n_from y n_to dejan fuera a los testers sin n y, sin order_by, ordenan por n. order_by y order eligen el orden; offset pide filas exactas de ese orden (para rangos de filas). Nunca incluye contraseñas: para eso está /credentials.",
+                "description": "Lista paginada de los testers de la app, cada uno con status (active | expired), ttl_remaining en segundos (ausente cuando no tiene vigencia) y test_seq (el n con el que nació, ausente si no es numerado). n_from y n_to dejan fuera a los testers sin n y, sin order_by, ordenan por n. order_by y order eligen el orden; offset pide filas exactas de ese orden (para rangos de filas). Cada elemento trae test_batch, la tanda con la que nació (ausente si no nació en una). Nunca incluye contraseñas: para eso está /credentials.",
                 "consumes": [
                     "application/json"
                 ],
@@ -4527,6 +4527,12 @@
                         "type": "string",
                         "description": "Búsqueda libre en email, user_name, name e id",
                         "name": "q",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Tanda: el id del trabajo o lote que creó a los testers (ver /testers/batches); none para los que no nacieron en una",
+                        "name": "batch",
                         "in": "query"
                     },
                     {
@@ -4739,6 +4745,60 @@
                 }
             }
         },
+        "/api/v1/testers/batches": {
+            "get": {
+                "description": "Agrupa los testers vivos de la app por tanda: los que nacieron en un mismo trabajo create (el batch es el id del trabajo) o en una misma llamada a /testers/bulk. Cada tanda trae batch, created_at (el primero de la tanda), count, active y expired, recientes primero y hasta 200. unbatched cuenta los testers que no nacieron en una tanda (se piden con batch=none). Una tanda sin testers vivos no aparece. Con batch=\u003ctanda\u003e, GET /testers, GET /testers/credentials y target.filter acotan a ella.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Testers"
+                ],
+                "summary": "Tandas de testers",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Secret API Key de la aplicación",
+                        "name": "X-API-KEY",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{batches: [{batch, created_at, count, active, expired}], unbatched}",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "401": {
+                        "description": "API Key inválida",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "422": {
+                        "description": "testers.disabled",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/testers/bulk": {
             "post": {
                 "description": "Crea count testers (1 a 200) con la misma vigencia. mode=realistic genera nombre y user_name (reintentando con sufijo ante una colisión); mode=pattern numera pattern de 1 a count ({n} obligatorio, por ejemplo juanito_{n}) y, si alguno de esos user_name ya existe, responde 409 con la lista y no crea ninguno. El lote es todo o nada. La respuesta trae las credenciales de todos, una sola vez.",
@@ -4811,7 +4871,7 @@
         },
         "/api/v1/testers/credentials": {
             "get": {
-                "description": "Recalcula la contraseña derivada de cada tester de la app y la devuelve junto con user_id, user_name, name, email, expires_at y status. format=json (default) responde la lista dentro de data; ids=a,b,c acota a esos testers (un id que no es tester de la app no aparece). format=csv responde text/csv con Content-Disposition attachment; filename=\"testers-\u003capp_id\u003e.csv\". Nada se lee de la base: la contraseña se deriva de la app, el correo y la llave vigente.",
+                "description": "Recalcula la contraseña derivada de cada tester de la app y la devuelve junto con user_id, user_name, name, email, expires_at y status. format=json (default) responde la lista dentro de data; ids=a,b,c acota a esos testers (un id que no es tester de la app no aparece); batch=\u003ctanda\u003e acota a los testers de una tanda (none: los que no nacieron en una) y no se combina con ids. format=csv responde text/csv con Content-Disposition attachment; filename=\"testers-\u003capp_id\u003e.csv\". Nada se lee de la base: la contraseña se deriva de la app, el correo y la llave vigente.",
                 "consumes": [
                     "application/json"
                 ],
@@ -4835,6 +4895,12 @@
                         "type": "string",
                         "description": "json (default) o csv",
                         "name": "format",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Tanda: el id del trabajo o lote que creó a los testers; none para los que no nacieron en una",
+                        "name": "batch",
                         "in": "query"
                     },
                     {
