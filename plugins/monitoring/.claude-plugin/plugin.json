@@ -1,0 +1,17 @@
+{
+  "name": "monitoring",
+  "version": "0.1.0",
+  "description": "Prepara tu app para Foundathyon Monitoring (preview, aún no disponible): endpoints /health y /ready bien diseñados y el plan de health checks, alertas e incidentes.",
+  "author": {
+    "name": "Foundathyon",
+    "url": "https://github.com/fundathyon"
+  },
+  "repository": "https://github.com/fundathyon/marketplace",
+  "keywords": [
+    "monitoring",
+    "health-check",
+    "uptime",
+    "alertas",
+    "foundathyon"
+  ]
+}
