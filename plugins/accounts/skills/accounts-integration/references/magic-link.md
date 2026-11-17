@@ -46,6 +46,8 @@ curl -X POST "{BASE_URL}/api/v1/emails/magic-link/request" \
 - Si magic link **disabled** → 422
 - Email enviado con enlace que apunta a tu frontend + token raw
 
+**Embedded Auth (Pro):** con la cabecera `X-Accounts-Client`, el body acepta `redirect_url`, que debe ser exactamente una de las `redirect_urls` del behavior `embedded_auth`. El correo vuelve entonces a `redirect_url?accounts_ticket=<R>` (no hace falta `redirect_base_url`); con el `redirect_url` aceptado es obligatorio `code_challenge = base64url(SHA-256(verifier))` (si no, `422 embedded_auth.magic_link.challenge_required`), y el componente canjea `/claim` con `D = hex(HMAC-SHA256(code_challenge, R))`, no con `R` (solo funciona en el navegador que pidió el link). Fuera de la lista → `403 embedded_auth.redirect.not_allowed` sin enviar nada. Sin la cabecera, en Community o si no es un string, `redirect_url` se ignora. Ver [embedded-auth.md](embedded-auth.md).
+
 ---
 
 ## Claim — canjear token

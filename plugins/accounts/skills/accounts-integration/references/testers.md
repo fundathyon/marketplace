@@ -119,6 +119,7 @@ curl -X POST "{BASE_URL}/api/v1/testers/regenerate" -H "X-API-Key: {secret_key}"
 ## 4. Iniciar sesión
 
 - **UI / e2e:** `POST /api/v1/emails/signin` (publishable key) con correo y contraseña de `/credentials`. Igual que una persona.
+- **Sin segundo factor:** los testers nunca reciben `mfa_required` ni `mfa_enrollment_required`, aunque el behavior `mfa` de la app esté en `required` (ver [mfa.md](mfa.md)).
 - **CI / scripts:** token directo, sin contraseña, mismo par que el signin:
 
 ```bash

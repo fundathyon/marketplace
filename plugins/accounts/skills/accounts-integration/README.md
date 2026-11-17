@@ -21,10 +21,12 @@ No necesitas clonar el repo de accounts: copia esta carpeta y listo.
 | `oauth.md` | Web redirect + native SDK |
 | `magic-link.md` | Passwordless por enlace |
 | `email-code.md` | Passwordless por código (email OTP) |
+| `embedded-auth.md` | Componentes web de login embebidos (Pro) |
 | `behaviors.md` | Config que cambia flujos |
 | `users.md` | Usuarios, metadata, change-email |
 | `testers.md` | Usuarios de prueba (testers) |
-| `roles-policies.md` | RBAC admin |
+| `roles-policies.md` | RBAC: policies, claim `role`, `/authorize`, verificador Go |
+| `mfa.md` | Segundo factor (TOTP, códigos de respaldo, behavior `mfa`) |
 | `webhooks.md` | Eventos HTTP |
 | `endpoints-reference.md` | Tabla completa endpoints |
 | `error-scopes.md` | Errores por scope |
