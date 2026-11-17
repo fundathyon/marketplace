@@ -5,15 +5,30 @@
     "url": "https://github.com/fundathyon"
   },
   "metadata": {
-    "description": "Conjunto de skills y herramientas de AI de Foundathyon para integrar sus servicios desde Claude Code, Cursor, Codex o Copilot.",
-    "version": "0.1.0"
+    "description": "Las herramientas de IA de Foundathyon para tu agente de código: un plugin por producto (Accounts, Cron jobs, Monitoring, Deployments) y uno para la plataforma como conjunto. Para Claude Code, Cursor, Codex y Copilot.",
+    "version": "0.2.0"
   },
   "plugins": [
     {
+      "name": "platform",
+      "source": "./plugins/platform",
+      "description": "La plataforma Foundathyon como conjunto: qué producto usar para cada necesidad, organización, proyectos y servicios, entornos, planes y límites, y recetas que combinan Accounts, Cron jobs, Monitoring y Deployments en una misma app.",
+      "version": "0.1.0",
+      "category": "platform",
+      "keywords": [
+        "foundathyon",
+        "plataforma",
+        "planes",
+        "entornos",
+        "arquitectura",
+        "recetas"
+      ]
+    },
+    {
       "name": "accounts",
       "source": "./plugins/accounts",
-      "description": "Integra Foundathyon Accounts: signup, signin, refresh token, OAuth, magic link, código de acceso por correo (email OTP), usuarios de prueba (testers), webhooks, roles y behaviors — con las rutas, headers y formato de respuesta reales.",
-      "version": "0.6.0",
+      "description": "Integra Foundathyon Accounts: signup, signin, refresh y logout, OAuth con canje de code, magic link, código por correo, MFA, testers, webhooks, roles y RBAC, Embedded Auth, MCP Connect, bloqueo por país y cuotas — con las rutas, headers y formato de respuesta reales.",
+      "version": "0.33.0",
       "category": "integration",
       "keywords": [
         "accounts",
@@ -22,8 +37,52 @@
         "magic-link",
         "email-code",
         "passwordless",
-        "testers",
+        "mfa",
+        "rbac",
         "webhooks",
+        "foundathyon"
+      ]
+    },
+    {
+      "name": "cron-jobs",
+      "source": "./plugins/cron-jobs",
+      "description": "Integra Foundathyon Cron jobs (preview): el endpoint protegido e idempotente que llama cada job, su configuración (horario, zona horaria, reintentos, timeout, secretos) y los límites del plan.",
+      "version": "0.1.0",
+      "category": "integration",
+      "keywords": [
+        "cron",
+        "cron-jobs",
+        "scheduler",
+        "background-jobs",
+        "foundathyon"
+      ]
+    },
+    {
+      "name": "monitoring",
+      "source": "./plugins/monitoring",
+      "description": "Prepara tu app para Foundathyon Monitoring (preview, aún no disponible): endpoints /health y /ready bien diseñados y el plan de health checks, alertas e incidentes.",
+      "version": "0.1.0",
+      "category": "integration",
+      "keywords": [
+        "monitoring",
+        "health-check",
+        "uptime",
+        "alertas",
+        "foundathyon"
+      ]
+    },
+    {
+      "name": "deployments",
+      "source": "./plugins/deployments",
+      "description": "Del commit a producción con Foundathyon (preview): CI Pipelines en .foundathyon/pipelines, imágenes en el Container Registry privado y la app lista para Deployments, que está en preparación.",
+      "version": "0.1.0",
+      "category": "integration",
+      "keywords": [
+        "deployments",
+        "ci",
+        "pipelines",
+        "registry",
+        "docker",
         "foundathyon"
       ]
     }
