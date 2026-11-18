@@ -1,0 +1,18 @@
+{
+  "name": "deployments",
+  "version": "0.1.0",
+  "description": "Del commit a producción con Foundathyon (preview): CI Pipelines en .foundathyon/pipelines, imágenes en el Container Registry privado y la app lista para Deployments, que está en preparación.",
+  "author": {
+    "name": "Foundathyon",
+    "url": "https://github.com/fundathyon"
+  },
+  "repository": "https://github.com/fundathyon/marketplace",
+  "keywords": [
+    "deployments",
+    "ci",
+    "pipelines",
+    "registry",
+    "docker",
+    "foundathyon"
+  ]
+}

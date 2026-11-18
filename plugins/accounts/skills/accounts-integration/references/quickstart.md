@@ -98,6 +98,15 @@ curl -X GET "{BASE_URL}/api/v1/refresh-jwt" \
   -H "Authorization: Bearer {refresh_token}"
 ```
 
+Guarda el `access_token` y el `refresh_token` de la respuesta: si la app activa la rotación, el refresh token cambia en cada refresh.
+
+## Paso 6 — Cerrar sesión
+
+```bash
+curl -X POST "{BASE_URL}/api/v1/logout" \
+  -H "Authorization: Bearer {refresh_token}"
+```
+
 ## Resumen del flujo
 
 1. `POST /v1/apps` → keys

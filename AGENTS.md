@@ -1,7 +1,8 @@
 # Guía para agentes — marketplace
 
-Este repositorio es la fuente pública de las skills de integración de
-Foundathyon. Cada skill se instala en Claude Code, Cursor, Codex y GitHub
+Este repositorio es el marketplace de todas las herramientas de IA de
+Foundathyon: las skills con las que el agente de código de un cliente integra
+y opera sus servicios. Cada skill se instala en Claude Code, Cursor, Codex y GitHub
 Copilot — por el marketplace de cada agente o copiando la carpeta — así que
 tiene que funcionar en todos, y un manifiesto roto rompe la instalación para
 todos.
@@ -12,7 +13,8 @@ Desde la raíz del repositorio:
 
 ```sh
 python3 scripts/validate.py                 # catálogo, manifiestos y skills
-python3 -m unittest discover tests          # el validador contra sí mismo
+python3 -m unittest discover tests          # el validador y el instalador
+sh scripts/install.sh --list                # qué plugins y skills hay
 claude plugin validate . --strict           # cómo lo lee Claude Code
 uvx --from 'git+https://github.com/agentskills/agentskills#subdirectory=skills-ref' \
   skills-ref validate plugins/<plugin>/skills/<skill>   # el validador del estándar
@@ -26,19 +28,41 @@ antes de mezclar, instálala desde este checkout en un repositorio de prueba:
 /plugin install <plugin>@foundathyon
 ```
 
-## La fuente de verdad no está aquí
+## Cómo se organiza el catálogo
 
-Cada skill se genera en el repositorio de su servicio y se copia aquí. Para
-`accounts` es `fundathyon/accounts` → `.agents/accounts-integration/`,
-regenerada con `make sync-integration-docs`. **Edita la skill allí**, no aquí:
-un cambio hecho solo en este repositorio desaparece en la siguiente copia.
+El catálogo se segmenta por producto, más un plugin para la plataforma como
+conjunto. El validador hace cumplir estas reglas:
 
-Lo único que vive solo aquí son los manifiestos, el README y este archivo.
+| Tipo | `category` | Plugin | Skills |
+| --- | --- | --- | --- |
+| Plataforma | `platform` | `platform`, exactamente uno | lo que cruza productos: modelo de organización y proyectos, planes, API keys, recetas que combinan varios productos |
+| Producto | `integration` | uno por producto: `accounts`, `cron-jobs`, `monitoring`, `deployments` | la integración de ese producto |
 
-## Añadir un servicio
+- **Un plugin por producto**, con el slug del producto en la documentación
+  (`docs.foundathyon.com/<slug>`). Un cliente instala solo los que usa.
+- **Toda skill se llama como su plugin**: `<plugin>-<qué hace>`
+  (`accounts-integration`, `platform-overview`). Así cada skill dice a qué
+  producto pertenece y dos productos nunca chocan.
+- **Una versión por plugin.** Todas sus skills llevan la misma.
+- **`metadata.status`**: `stable` o `preview`. Una skill `preview` cubre un
+  producto cuya API todavía cambia; su `SKILL.md` lo dice al principio y le
+  indica al agente qué no debe asumir.
 
-Un plugin es la unidad que instala un agente; uno por servicio. Una skill es
-lo que el agente lee; una por plugin salvo que de verdad haga falta más.
+## De dónde sale cada skill
+
+| Plugin | Fuente de verdad | Cómo se actualiza |
+| --- | --- | --- |
+| `accounts` | `fundathyon/accounts` → `.agents/accounts-integration/` | `make sync-integration-docs` allí y se copia aquí desde `develop`. **Edita la skill allí**: un cambio hecho solo aquí desaparece en la siguiente copia |
+| `platform`, `cron-jobs`, `monitoring`, `deployments` | este repositorio | se editan aquí, contra el código del servicio y `docs.foundathyon.com`, hasta que el repositorio del servicio genere su propia skill como `accounts` |
+
+Cuando un servicio pase a generar su skill, cambia su fila: desde ese momento
+se edita allí.
+
+## Añadir un producto
+
+Un plugin es la unidad que instala un agente; uno por producto. Una skill es
+lo que el agente lee; una por plugin salvo que de verdad haga falta más
+(el plugin `platform` tiene varias porque cubre temas distintos).
 
 1. **Crear las carpetas**, con la skill en el layout del estándar:
 
@@ -72,10 +96,14 @@ lo que el agente lee; una por plugin salvo que de verdad haga falta más.
    llevan el mismo `name`, `version` y `description`.
 
 4. **Listar el plugin** en `.claude-plugin/marketplace.json`, con `source` en
-   string relativo (`"./plugins/<servicio>"`), `category` y `version`. Codex
-   ignora cualquier otro tipo de `source`.
+   string relativo (`"./plugins/<servicio>"`), `category` (`integration`) y
+   `version`. Codex ignora cualquier otro tipo de `source`.
 
-5. **Validar**, y añadir la fila a la tabla del README.
+5. **Enlazarlo desde la plataforma**: añade el producto a la tabla de
+   productos de `plugins/platform/skills/platform-overview/SKILL.md`, para que
+   el agente sepa que existe y qué plugin instalar.
+
+6. **Validar**, y añadir la fila a la tabla del README.
 
 ## Skills que funcionan en todos los agentes
 

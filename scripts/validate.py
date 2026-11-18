@@ -16,6 +16,16 @@ both, plus two this repository needs because it is public:
 - Nothing that looks like a credential ships in a skill: the repository is
   public and the skill is copied into many machines.
 
+And the rules that keep the catalogue segmented by product:
+
+- Every plugin is either a Foundathyon product (category "integration") or the
+  platform as a whole (category "platform"), and there is exactly one platform
+  plugin.
+- Every skill is named after its plugin ("<plugin>-…"), so a skill always says
+  which product it belongs to and two products never collide.
+- A plugin has one version, and every skill in it carries that version.
+- metadata.status, when present, is "stable" or "preview".
+
 Standard library only, except that PyYAML is used when it is installed — it
 parses frontmatter the way the agents do, where the fallback reader is only
 approximate. CI installs it.
@@ -41,6 +51,9 @@ MARKDOWN_LINK = re.compile(r"\]\(([^)\s#]+)(?:#[^)]*)?\)")
 FENCED_BLOCK = re.compile(r"^(\s*)(`{3,}|~{3,}).*?^\1\2[ \t]*$", re.DOTALL | re.MULTILINE)
 INLINE_CODE = re.compile(r"(`+).+?\1")
 RESERVED = ("anthropic", "claude")
+CATEGORIES = ("integration", "platform")
+PLATFORM_PLUGIN = "platform"
+STATUSES = ("stable", "preview")
 BODY_LINES = 500
 # The description is read in Spanish or English; either phrasing says when to use the skill.
 USE_WHEN = ("use when", "use it when", "usar cuando", "usar para", "úsalo cuando", "usa cuando")
@@ -210,6 +223,9 @@ def check_skill(skill_dir: Path, report: Report) -> dict | None:
             version = metadata.get("version")
     if not isinstance(version, str) or not SEMVER.match(version):
         report.error(where, f"metadata.version {version!r} must be a semantic version, quoted")
+    status = metadata.get("status") if isinstance(metadata, dict) else None
+    if status is not None and status not in STATUSES:
+        report.error(where, f"metadata.status {status!r} must be one of {', '.join(STATUSES)}")
 
     if len(body.splitlines()) > BODY_LINES:
         report.warn(where, f"SKILL.md body is over {BODY_LINES} lines — move detail to references/")
@@ -252,6 +268,11 @@ def check_plugin(root: Path, entry: dict, report: Report) -> list[str]:
         if not entry.get(key):
             report.error(where, f"the marketplace entry has no {key}")
     version = entry.get("version")
+    category = entry.get("category")
+    if category and category not in CATEGORIES:
+        report.error(where, f"category {category!r} must be one of {', '.join(CATEGORIES)}")
+    if (category == "platform") != (name == PLATFORM_PLUGIN):
+        report.error(where, f"only the {PLATFORM_PLUGIN!r} plugin has category \"platform\"; products use \"integration\"")
 
     agent_plugins = read_json(plugin_dir / "plugin.json", report, where)
     claude = read_json(plugin_dir / ".claude-plugin" / "plugin.json", report, where)
@@ -279,7 +300,9 @@ def check_plugin(root: Path, entry: dict, report: Report) -> list[str]:
         if skill is None:
             continue
         names.append(skill["name"])
-        if len(skill_dirs) == 1 and skill["version"] and version and skill["version"] != version:
+        if isinstance(skill["name"], str) and not skill["name"].startswith(name + "-"):
+            report.error(str(skill_dir), f"skill {skill['name']!r} must be named after its plugin: {name}-…")
+        if skill["version"] and version and skill["version"] != version:
             report.error(str(skill_dir), f"version {skill['version']} differs from its plugin's {version}")
     return names
 
@@ -303,6 +326,8 @@ def main(argv: list[str] | None = None) -> int:
             report.error("marketplace", "plugins must be a non-empty list")
             plugins = []
         seen_plugins = set()
+        if not any(isinstance(e, dict) and e.get("name") == PLATFORM_PLUGIN for e in plugins):
+            report.error("marketplace", f"the {PLATFORM_PLUGIN!r} plugin, with the skills for the platform as a whole, is missing")
         for entry in plugins:
             if not isinstance(entry, dict):
                 report.error("marketplace", "every plugin entry must be an object")

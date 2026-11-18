@@ -1,0 +1,18 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "cron-jobs",
+  "version": "0.1.0",
+  "description": "Integra Foundathyon Cron jobs (preview): el endpoint protegido e idempotente que llama cada job, su configuración (horario, zona horaria, reintentos, timeout, secretos) y los límites del plan.",
+  "author": {
+    "name": "Foundathyon",
+    "url": "https://github.com/fundathyon"
+  },
+  "repository": "https://github.com/fundathyon/marketplace",
+  "keywords": [
+    "cron",
+    "cron-jobs",
+    "scheduler",
+    "background-jobs",
+    "foundathyon"
+  ]
+}
